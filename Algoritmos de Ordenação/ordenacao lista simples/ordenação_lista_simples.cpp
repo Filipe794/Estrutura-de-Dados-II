@@ -21,10 +21,10 @@ void imprimir()
     }
     printf("\n\n");
 }
-void ler_nome(No *No)
+void ler_nome(No *Novo)
 {
     printf("\nDigite um nome: ");
-    scanf("%s", No->nome);
+    scanf("%s", Novo->nome);
 }
 void inserir()
 {
@@ -43,10 +43,6 @@ void menu()
     printf("6 - Ordenar por Insertion Sort\n");
     printf("0 - Sair\n");
 }
-// void embaralhar(No *lista)
-// {
-// }
-
 No *prev(No *referencia)
 {
     if (referencia == NULL || referencia == cabeca)
