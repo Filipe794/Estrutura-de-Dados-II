@@ -78,7 +78,10 @@ void selection_sort()
         if (menor != inserir)
         {
             No *anterior_menor = prev(menor);
-            anterior_menor->proximo = menor->proximo;
+            if (anterior_menor != NULL)
+            {
+                anterior_menor->proximo = menor->proximo;
+            }
             if (inserir == cabeca)
             {
                 cabeca = menor;
