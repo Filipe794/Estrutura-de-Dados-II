@@ -170,7 +170,7 @@ void bubble_sort()
     No *ultimo = NULL;
     // ultimo é o ponteiro para o ultimo elemento da lista
     // ele sera sempre atualizado ao final do laço mais exterior para limitar a repetição e não comparar com elementos já ordernados
-    if (cabeca == NULL)
+    if (cabeca == NULL || cabeca->proximo == NULL)
         return;
     do
     {
@@ -178,7 +178,6 @@ void bubble_sort()
         aux = cabeca;
         while (aux->proximo != ultimo)
         {
-            printf("entrou\n");
             if (strcmp(aux->nome, aux->proximo->nome) > 0)
             {
                 // troca os ponteiros dos nós
