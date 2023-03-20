@@ -128,7 +128,6 @@ void insertion_sort()
     {
         while (aux != troca)
         {
-            imprimir();
             if (strcmp(aux->nome, troca->nome) > 0)
             {
                 troca_insertion(aux, troca, proximo, anterior);
