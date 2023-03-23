@@ -194,6 +194,9 @@ void bubble_sort()
         ultimo = aux;
     } while (cont_troca != 0);
 }
+void quick_sort(){
+    
+}
 int main()
 {
     int opcao;
