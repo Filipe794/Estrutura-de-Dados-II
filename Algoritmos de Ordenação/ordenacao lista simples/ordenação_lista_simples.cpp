@@ -195,7 +195,7 @@ void bubble_sort()
     } while (cont_troca != 0);
 }
 void quick_sort(){
-    
+
 }
 int main()
 {
