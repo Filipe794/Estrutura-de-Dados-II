@@ -5,7 +5,7 @@
 
 typedef struct No
 {
-    char nome[30];
+    char nome[50];
     struct No *proximo;
 } No;
 
@@ -48,11 +48,15 @@ No *prev(No *referencia)
     if (referencia == NULL || referencia == cabeca)
         return NULL;
     No *aux = cabeca;
-    while (aux->proximo != referencia)
+    while (aux != NULL)
     {
+        if (aux->proximo == referencia)
+        {
+            return aux;
+        }
         aux = aux->proximo;
     }
-    return aux;
+    return NULL;
 }
 void selection_sort()
 {
@@ -194,6 +198,101 @@ void bubble_sort()
         ultimo = aux;
     } while (cont_troca != 0);
 }
+int length()
+{
+    No *aux = cabeca;
+    int cont = 0;
+    while (aux != NULL)
+    {
+        aux = aux->proximo;
+        cont++;
+    }
+    return cont;
+}
+void swap(No *cel1, No *cel2)
+{
+    if ((cel1 == NULL) || (cel2 == NULL))
+        return;
+
+    No *ant1 = NULL;
+    No *ant2 = NULL;
+
+    No *tmp = NULL;
+
+    if ((cabeca == cel2) || (cel2->proximo == cel1))
+    {
+        tmp = cel2;
+        cel2 = cel1;
+        cel1 = tmp;
+    }
+
+    if (cabeca != cel1)
+    {
+        ant1 = prev(cel1);
+    }
+
+    ant2 = prev(cel2);
+
+    if (cel1 != cel2)
+    {
+        tmp = cel2->proximo;
+
+        if (ant1 != NULL)
+        {
+            ant1->proximo = cel2;
+        }
+
+        if (cel1 != ant2)
+        {
+            ant2->proximo = cel1;
+            cel2->proximo = cel1->proximo;
+
+            if (cel2->proximo == cel1)
+            {
+                cel1->proximo = cel2;
+            }
+            else
+            {
+                cel1->proximo = tmp;
+            }
+        }
+        else
+        {
+            cel2->proximo = cel1;
+            cel1->proximo = tmp;
+        }
+
+        if (cabeca == cel1)
+        {
+            cabeca = cel2;
+        }
+    }
+}
+No *pos(int p)
+{
+    No *aux = cabeca;
+    int cont = 0;
+    while (aux != NULL)
+    {
+        if (cont == p)
+        {
+            return aux;
+        }
+        aux = aux->proximo;
+        cont++;
+    }
+    return NULL;
+}
+void shuffle()
+{
+    int size = length();
+    for (int i = 0; i < size; i++)
+    {
+        No *cel1 = pos(rand() % size);
+        No *cel2 = pos(rand() % size);
+        swap(cel1, cel2);
+    }
+}
 int main()
 {
     int opcao;
@@ -211,7 +310,7 @@ int main()
             imprimir();
             break;
         case 3:
-            // embaralhar();
+            shuffle();
             break;
         case 4:
             bubble_sort();
