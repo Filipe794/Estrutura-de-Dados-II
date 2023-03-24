@@ -5,7 +5,7 @@
 typedef struct No
 {
     int conteudo;
-    struct No *seg;
+    struct No *proximo;
 } No;
 
 No *cabeca = NULL;
@@ -15,9 +15,9 @@ No *prev(No *referencia)
     if (referencia == NULL || referencia == cabeca)
         return NULL;
     No *aux = cabeca;
-    while (aux->seg != referencia)
+    while (aux->proximo != referencia)
     {
-        aux = aux->seg;
+        aux = aux->proximo;
     }
     return aux;
 }
@@ -33,7 +33,7 @@ void inserir()
 {
     No *Novo = (No *)malloc(sizeof(No));
     gera_num(Novo);
-    Novo->seg = cabeca;
+    Novo->proximo = cabeca;
     cabeca = Novo;
 }
 void imprimir()
@@ -42,18 +42,33 @@ void imprimir()
     while (aux != NULL)
     {
         printf("%d ->  ", aux->conteudo);
-        aux = aux->seg;
+        aux = aux->proximo;
     }
     printf("\n\n");
 }
-// No *ultimo(){
-//     No *aux = cabeca;
-//     while (aux->seg != NULL)
-//     {
-//         aux = aux->seg;
-//     }
-//     return aux;
-// }
+No *ultimo(){
+    No *aux = cabeca;
+    while (aux->proximo != NULL)
+    {
+        aux = aux->proximo;
+    }
+    return aux;
+}
+
+void quick_sort(){
+    //escolher o pivo:
+    //  primeiro elemento, elemento do meio ou um aleatorio?
+    // separar a lista a partir desse pivo
+    //      if(cabeca!=pivo){
+    //          aux = cabeca;
+    //      }else{
+    //          
+    //      }
+    //      percorrer de:
+    //          aux ate prev(anterior)
+    //          pivo->proximo ate ultimo(cabeca)
+    // recursividade passando as duas partes da lista
+}
 
 int main()
 {
