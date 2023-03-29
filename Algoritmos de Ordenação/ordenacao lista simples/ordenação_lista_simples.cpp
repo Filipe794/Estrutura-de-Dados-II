@@ -58,50 +58,6 @@ No *prev(No *referencia)
     }
     return NULL;
 }
-void selection_sort()
-{
-    if (cabeca == NULL || cabeca->proximo == NULL)
-        return;
-
-    No *menor, *inserir = cabeca;
-    No *aux = menor->proximo;
-
-    while (inserir->proximo != NULL)
-    {
-        menor = inserir;
-        aux = inserir->proximo;
-
-        while (aux != NULL)
-        {
-            if (strcmp(menor->nome, aux->nome) > 0)
-            {
-                menor = aux;
-            }
-            aux = aux->proximo;
-        }
-        if (menor != inserir)
-        {
-            No *anterior_menor = prev(menor);
-            if (anterior_menor != NULL)
-            {
-                anterior_menor->proximo = menor->proximo;
-            }
-            if (inserir == cabeca)
-            {
-                cabeca = menor;
-                menor->proximo = inserir;
-            }
-            else
-            {
-                No *anterior_inserir = prev(inserir);
-                anterior_inserir->proximo = menor;
-                menor->proximo = inserir;
-            }
-            inserir = menor;
-        }
-        inserir = inserir->proximo;
-    }
-}
 void troca_insertion(No *aux, No *troca, No *proximo, No *anterior)
 {
     if (aux == cabeca)
@@ -174,8 +130,6 @@ void bubble_sort()
     int cont_troca;
     No *aux = NULL;
     No *ultimo = NULL;
-    // ultimo é o ponteiro para o ultimo elemento da lista
-    // ele sera sempre atualizado ao final do laço mais exterior para limitar a repetição e não comparar com elementos já ordernados
     if (cabeca == NULL || cabeca->proximo == NULL)
         return;
     do
@@ -186,7 +140,6 @@ void bubble_sort()
         {
             if (strcmp(aux->nome, aux->proximo->nome) > 0)
             {
-                // troca os ponteiros dos nós
                 troca_proximo(aux);
                 cont_troca = 1;
             }
@@ -291,6 +244,34 @@ void shuffle()
         No *cel1 = pos(rand() % size);
         No *cel2 = pos(rand() % size);
         swap(cel1, cel2);
+    }
+}
+void selection_sort()
+{
+    if (cabeca == NULL || cabeca->proximo == NULL)
+        return;
+
+    No *menor, *inserir = cabeca;
+    No *aux = menor->proximo;
+
+    while (inserir->proximo != NULL)
+    {
+        menor = inserir;
+        aux = inserir->proximo;
+
+        while (aux != NULL)
+        {
+            if (strcmp(menor->nome, aux->nome) > 0)
+            {
+                menor = aux;
+            }
+            aux = aux->proximo;
+        }
+        if(menor!=inserir){
+          swap(inserir,menor);
+          inserir = menor;
+        }
+        inserir = inserir->proximo;
     }
 }
 int main()
