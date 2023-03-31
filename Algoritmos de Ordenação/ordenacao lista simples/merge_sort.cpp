@@ -121,7 +121,7 @@ int main()
         switch (opcao)
         {
         case 1:
-            inserir();
+            inserir_fim();
             break;
         case 2:
             imprimir();
