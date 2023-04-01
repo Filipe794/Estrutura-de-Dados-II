@@ -9,7 +9,6 @@ typedef struct No
     struct No *proximo;
     struct No *anterior;
 } No;
-
 No *cabeca = NULL;
 No *fim = NULL;
 
