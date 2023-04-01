@@ -3,9 +3,6 @@
 #include <string.h>
 #include <time.h>
 
-
-#include <stdio.h>
-
 typedef struct cel {
   int num;
   cel *ant;
@@ -121,13 +118,13 @@ int main()
         switch (opcao)
         {
         case 1:
-            inserir_fim();
+            // inserir_fim();
             break;
         case 2:
-            imprimir();
+            // imprimir();
             break;
         case 3:
-            merge();
+            // merge();
             break;
         case 0:
             break;

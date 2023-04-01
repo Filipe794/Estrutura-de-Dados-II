@@ -11,7 +11,7 @@ typedef struct No
 } No;
 
 No *cabeca = NULL;
-
+No *fim = NULL;
 void imprimir()
 {
     No *inicio = cabeca;
@@ -30,24 +30,128 @@ void ler_nome(No *Novo)
 void inserir()
 {
     No *Novo = new No;
+    if (cabeca == NULL)
+    {
+        ler_nome(Novo);
+        cabeca = Novo;
+        fim = Novo;
+        return;
+    }
     ler_nome(Novo);
     Novo->proximo = cabeca;
     Novo->anterior = cabeca->anterior;
     cabeca->anterior = Novo;
     cabeca = Novo;
 }
-
-void troca(No *elem1, No *elem2)
+void imprimir_inverso()
 {
-    No *prim = elem1->anterior;
-    No *ult = elem2->proximo;
+    No *aux = fim;
+    while (aux != NULL)
+    {
+        printf("%s ->  ", aux->nome);
+        aux = aux->anterior;
+    }
+    printf("\n\n");
+}
 
-    prim->proximo = elem2;
-    ult->anterior = elem1;
-    elem2->proximo = elem1;
-    elem1->proximo = ult;
-    elem1->anterior = elem2;
-    elem2->anterior = prim;
+// void troca(No *elem1, No *elem2)
+// {
+//     if ((elem1 == NULL) || (elem2 == NULL))
+//         return;
+//     if(elem2 == fim) fim = elem1;
+//     No *ant_elem1 = elem1->anterior;
+//     No *prox_elem1 = elem1->proximo;
+//     No *prox_elem2 = elem2->proximo;
+//     No *ant_elem2 = elem2->anterior;
+//     if (elem1 == cabeca)
+//     {
+//         ant_elem2->proximo = elem1;
+//         prox_elem2->anterior = elem1;
+//         elem2->anterior = ant_elem1;
+//         elem1->anterior = ant_elem2;
+//         elem1->proximo = prox_elem2;
+//         elem2->proximo = prox_elem1;
+//         prox_elem1->anterior = elem2;
+//         cabeca = elem2;
+//         return;
+//     }
+//     if(elem1->proximo == elem2){
+//         ant_elem1->proximo = elem2;
+//         elem2->anterior = ant_elem1;
+//         elem2->proximo = elem1;
+//         elem1->anterior = elem2;
+//         elem1->proximo = prox_elem2;
+//         prox_elem2->anterior = elem1;
+//         return;
+//     }
+//     ant_elem1->proximo = elem2;
+//     ant_elem2->proximo = elem1;
+//     prox_elem2->anterior = elem1;
+//     prox_elem1->anterior = elem2;
+//     elem2->proximo = prox_elem1;
+//     elem1->proximo = prox_elem2;
+//     elem1->anterior = ant_elem2;
+//     elem2->anterior = ant_elem1;
+// }
+
+void swap(No *cel1, No *cel2)
+{
+    if ((cel1 == NULL) || (cel2 == NULL))
+        return;
+
+    No *ant1 = NULL;
+    No *ant2 = NULL;
+
+    No *tmp = NULL;
+
+    if ((cabeca == cel2) || (cel2->proximo == cel1))
+    {
+        tmp = cel2;
+        cel2 = cel1;
+        cel1 = tmp;
+    }
+
+    if (cabeca != cel1)
+    {
+        ant1 = cel1->anterior;
+    }
+
+    ant2 = cel2->anterior;
+
+    if (cel1 != cel2)
+    {
+        tmp = cel2->proximo;
+
+        if (ant1 != NULL)
+        {
+            ant1->proximo = cel2;
+        }
+
+        if (cel1 != ant2)
+        {
+            ant2->proximo = cel1;
+            cel2->proximo = cel1->proximo;
+
+            if (cel2->proximo == cel1)
+            {
+                cel1->proximo = cel2;
+            }
+            else
+            {
+                cel1->proximo = tmp;
+            }
+        }
+        else
+        {
+            cel2->proximo = cel1;
+            cel1->proximo = tmp;
+        }
+
+        if (cabeca == cel1)
+        {
+            cabeca = cel2;
+        }
+    }
 }
 
 void menu()
@@ -153,101 +257,6 @@ void bubble_sort()
         ultimo = aux;
     } while (cont_troca != 0);
 }
-int length()
-{
-    No *aux = cabeca;
-    int cont = 0;
-    while (aux != NULL)
-    {
-        aux = aux->proximo;
-        cont++;
-    }
-    return cont;
-}
-void swap(No *cel1, No *cel2)
-{
-    if ((cel1 == NULL) || (cel2 == NULL))
-        return;
-
-    No *ant1 = NULL;
-    No *ant2 = NULL;
-
-    No *tmp = NULL;
-
-    if ((cabeca == cel2) || (cel2->proximo == cel1))
-    {
-        tmp = cel2;
-        cel2 = cel1;
-        cel1 = tmp;
-    }
-
-    if (cabeca != cel1)
-    {
-        ant1 = cel1->anterior;
-    }
-
-    ant2 = cel2->anterior;
-
-    if (cel1 != cel2)
-    {
-        tmp = cel2->proximo;
-
-        if (ant1 != NULL)
-        {
-            ant1->proximo = cel2;
-        }
-
-        if (cel1 != ant2)
-        {
-            ant2->proximo = cel1;
-            cel2->proximo = cel1->proximo;
-
-            if (cel2->proximo == cel1)
-            {
-                cel1->proximo = cel2;
-            }
-            else
-            {
-                cel1->proximo = tmp;
-            }
-        }
-        else
-        {
-            cel2->proximo = cel1;
-            cel1->proximo = tmp;
-        }
-
-        if (cabeca == cel1)
-        {
-            cabeca = cel2;
-        }
-    }
-}
-No *pos(int p)
-{
-    No *aux = cabeca;
-    int cont = 0;
-    while (aux != NULL)
-    {
-        if (cont == p)
-        {
-            return aux;
-        }
-        aux = aux->proximo;
-        cont++;
-    }
-    return NULL;
-}
-void shuffle()
-{
-    int size = length();
-    for (int i = 0; i < size; i++)
-    {
-        No *cel1 = pos(rand() % size);
-        No *cel2 = pos(rand() % size);
-        swap(cel1, cel2);
-    }
-}
 void selection_sort()
 {
     if (cabeca == NULL || cabeca->proximo == NULL)
@@ -271,8 +280,7 @@ void selection_sort()
         }
         if (menor != inserir)
         {
-            // swap(inserir, menor);
-            // fazer uma função troca pro selection (troca dois elementos de posição)
+            swap(inserir, menor);
             inserir = menor;
         }
         inserir = inserir->proximo;
@@ -292,18 +300,18 @@ int main()
             inserir();
             break;
         case 2:
+            printf("a partir da cabeca\n");
             imprimir();
+            printf("a partir do fim\n");
+            imprimir_inverso();
             break;
         case 3:
-            shuffle();
-            break;
-        case 4:
             bubble_sort();
             break;
-        case 5:
+        case 4:
             selection_sort();
             break;
-        case 6:
+        case 5:
             insertion_sort();
             break;
         case 0:
