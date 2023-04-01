@@ -43,10 +43,7 @@ int main(){
     scanf("%d", &tam);
     int vetor[tam];
 
-    srand(time(NULL));
-    for (int i = 0; i < tam; i++){
-        vetor[i] = rand() % 10;
-    }
+    
 
     // for (int i = 0; i < tam; i++){
     //     printf("%d ->", vetor[i]);

@@ -20,6 +20,7 @@ void imprimir()
         printf("%s ->  ", inicio->nome);
         inicio = inicio->proximo;
     }
+    printf("NULL");
     printf("\n\n");
 }
 void ler_nome(No *Novo)
@@ -51,107 +52,51 @@ void imprimir_inverso()
         printf("%s ->  ", aux->nome);
         aux = aux->anterior;
     }
+    printf("NULL");
     printf("\n\n");
 }
 
-// void troca(No *elem1, No *elem2)
-// {
-//     if ((elem1 == NULL) || (elem2 == NULL))
-//         return;
-//     if(elem2 == fim) fim = elem1;
-//     No *ant_elem1 = elem1->anterior;
-//     No *prox_elem1 = elem1->proximo;
-//     No *prox_elem2 = elem2->proximo;
-//     No *ant_elem2 = elem2->anterior;
-//     if (elem1 == cabeca)
-//     {
-//         ant_elem2->proximo = elem1;
-//         prox_elem2->anterior = elem1;
-//         elem2->anterior = ant_elem1;
-//         elem1->anterior = ant_elem2;
-//         elem1->proximo = prox_elem2;
-//         elem2->proximo = prox_elem1;
-//         prox_elem1->anterior = elem2;
-//         cabeca = elem2;
-//         return;
-//     }
-//     if(elem1->proximo == elem2){
-//         ant_elem1->proximo = elem2;
-//         elem2->anterior = ant_elem1;
-//         elem2->proximo = elem1;
-//         elem1->anterior = elem2;
-//         elem1->proximo = prox_elem2;
-//         prox_elem2->anterior = elem1;
-//         return;
-//     }
-//     ant_elem1->proximo = elem2;
-//     ant_elem2->proximo = elem1;
-//     prox_elem2->anterior = elem1;
-//     prox_elem1->anterior = elem2;
-//     elem2->proximo = prox_elem1;
-//     elem1->proximo = prox_elem2;
-//     elem1->anterior = ant_elem2;
-//     elem2->anterior = ant_elem1;
-// }
-
-void swap(No *cel1, No *cel2)
+void troca(No *elem1, No *elem2)
 {
-    if ((cel1 == NULL) || (cel2 == NULL))
+   if (cabeca == NULL || elem1 == NULL || elem2 == NULL) {
         return;
+    }
+    if(elem2 == fim) fim = elem1;
 
-    No *ant1 = NULL;
-    No *ant2 = NULL;
-
-    No *tmp = NULL;
-
-    if ((cabeca == cel2) || (cel2->proximo == cel1))
-    {
-        tmp = cel2;
-        cel2 = cel1;
-        cel1 = tmp;
+    if (cabeca == elem1) {
+        cabeca = elem2;
+    } else if (cabeca == elem2) {
+        cabeca = elem1;
     }
 
-    if (cabeca != cel1)
-    {
-        ant1 = cel1->anterior;
+    if (elem1->anterior != NULL) {
+        elem1->anterior->proximo = elem2;
+    } else {
+        cabeca = elem2;
     }
 
-    ant2 = cel2->anterior;
-
-    if (cel1 != cel2)
-    {
-        tmp = cel2->proximo;
-
-        if (ant1 != NULL)
-        {
-            ant1->proximo = cel2;
-        }
-
-        if (cel1 != ant2)
-        {
-            ant2->proximo = cel1;
-            cel2->proximo = cel1->proximo;
-
-            if (cel2->proximo == cel1)
-            {
-                cel1->proximo = cel2;
-            }
-            else
-            {
-                cel1->proximo = tmp;
-            }
-        }
-        else
-        {
-            cel2->proximo = cel1;
-            cel1->proximo = tmp;
-        }
-
-        if (cabeca == cel1)
-        {
-            cabeca = cel2;
-        }
+    if (elem2->anterior != NULL) {
+        elem2->anterior->proximo = elem1;
+    } else {
+        cabeca = elem1;
     }
+
+    No* temp = elem1->anterior;
+    elem1->anterior = elem2->anterior;
+    elem2->anterior = temp;
+
+    temp = elem1->proximo;
+    elem1->proximo = elem2->proximo;
+    elem2->proximo = temp;
+
+    if (elem1->proximo != NULL) {
+        elem1->proximo->anterior = elem1;
+    }
+
+    if (elem2->proximo != NULL) {
+        elem2->proximo->anterior = elem2;
+    }
+    
 }
 void menu()
 {
@@ -279,7 +224,7 @@ void selection_sort()
         }
         if (menor != inserir)
         {
-            swap(inserir, menor);
+            troca(inserir, menor);
             inserir = menor;
         }
         inserir = inserir->proximo;
