@@ -153,7 +153,6 @@ void swap(No *cel1, No *cel2)
         }
     }
 }
-
 void menu()
 {
     printf("1 - Adicionar um novo elemento\n");
