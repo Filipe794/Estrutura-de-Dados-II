@@ -12,6 +12,7 @@ typedef struct No
 
 No *cabeca = NULL;
 No *fim = NULL;
+
 void imprimir()
 {
     No *inicio = cabeca;
@@ -55,12 +56,12 @@ void imprimir_inverso()
     printf("NULL");
     printf("\n\n");
 }
-
-void troca(No *elem1, No *elem2)
+void troca_posicao(No *elem1, No *elem2)
 {
    if (cabeca == NULL || elem1 == NULL || elem2 == NULL) {
         return;
     }
+
     if(elem2 == fim) fim = elem1;
 
     if (cabeca == elem1) {
@@ -71,14 +72,10 @@ void troca(No *elem1, No *elem2)
 
     if (elem1->anterior != NULL) {
         elem1->anterior->proximo = elem2;
-    } else {
-        cabeca = elem2;
     }
 
     if (elem2->anterior != NULL) {
         elem2->anterior->proximo = elem1;
-    } else {
-        cabeca = elem1;
     }
 
     No* temp = elem1->anterior;
@@ -143,7 +140,7 @@ void insertion_sort()
         {
             if (strcmp(aux->nome, troca->nome) > 0)
             {
-                troca_insertion(aux, troca, proximo, anterior);
+                troca_posicao(aux, troca);
                 break;
             }
             aux = aux->proximo;
@@ -190,7 +187,7 @@ void bubble_sort()
         {
             if (strcmp(aux->nome, aux->proximo->nome) > 0)
             {
-                troca_proximo(aux);
+                troca_posicao(aux, aux->proximo);
                 cont_troca = 1;
             }
             else
@@ -224,7 +221,7 @@ void selection_sort()
         }
         if (menor != inserir)
         {
-            troca(inserir, menor);
+            troca_posicao(inserir, menor);
             inserir = menor;
         }
         inserir = inserir->proximo;

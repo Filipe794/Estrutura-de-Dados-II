@@ -14,9 +14,11 @@ No *cabeca = NULL;
 No *fim = NULL;
 void menu()
 {
-    printf("1 - Adicionar um novo elemento\n");
+    printf("1 - Adicionar elementos\n");
     printf("2 - Imprimir a lista\n");
     printf("3 - Ordenar por Selection Sort\n");
+    printf("4 - Ordenar por Insertion Sort\n");
+    printf("5 - Ordenar por Bubble Sort\n");
     printf("0 - Sair\n");
 }
 void imprimir()
@@ -34,7 +36,7 @@ void inserir(int valor)
 {
     No *Novo = new No;
     if (cabeca == NULL)
-    {   
+    {
         Novo->proximo = NULL;
         Novo->anterior = NULL;
         Novo->valor = valor;
@@ -59,12 +61,13 @@ void imprimir_inverso()
     printf("NULL");
     printf("\n\n");
 }
-void troca(No *elem1, No *elem2)
+void troca_posicao(No *elem1, No *elem2)
 {
     if (cabeca == NULL || elem1 == NULL || elem2 == NULL)
     {
         return;
     }
+
     if (elem2 == fim)
         fim = elem1;
 
@@ -81,18 +84,10 @@ void troca(No *elem1, No *elem2)
     {
         elem1->anterior->proximo = elem2;
     }
-    else
-    {
-        cabeca = elem2;
-    }
 
     if (elem2->anterior != NULL)
     {
         elem2->anterior->proximo = elem1;
-    }
-    else
-    {
-        cabeca = elem1;
     }
 
     No *temp = elem1->anterior;
@@ -136,11 +131,63 @@ void selection_sort()
         }
         if (menor != inserir)
         {
-            troca(inserir, menor);
+            troca_posicao(inserir, menor);
             inserir = menor;
         }
         inserir = inserir->proximo;
     }
+}
+void insertion_sort()
+{
+    if (cabeca == NULL || cabeca->proximo == NULL)
+        return;
+
+    No *troca = cabeca->proximo;
+    No *aux = cabeca;
+    No *proximo = troca->proximo;
+
+    while (troca != NULL)
+    {
+        while (aux != troca)
+        {
+            if (troca->valor < aux->valor)
+            {
+                troca_posicao(troca, aux);
+                break;
+            }
+            aux = aux->proximo;
+        }
+        troca = proximo;
+        aux = cabeca;
+        if (troca != NULL)
+            proximo = troca->proximo;
+    }
+}
+void bubble_sort()
+{
+    int cont_troca;
+    No *aux = NULL;
+    No *ultimo = NULL;
+    if (cabeca == NULL || cabeca->proximo == NULL)
+        return;
+    do
+    {
+        cont_troca = 0;
+        aux = cabeca;
+        while (aux->proximo != ultimo)
+        {
+            if (aux->proximo->valor < aux->valor)
+            {
+                troca_posicao(aux, aux->proximo);
+                cont_troca = 1;
+            }
+            else
+            {
+                aux = aux->proximo;
+            }
+        }
+        ultimo = aux;
+    } while (cont_troca != 0);
 }
 int main()
 {
@@ -155,9 +202,9 @@ int main()
         case 1:
             srand(time(NULL));
             int num;
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 10; i++)
             {
-                num = rand() % 10;
+                num = rand() % 8;
                 inserir(num);
             }
             break;
@@ -169,6 +216,12 @@ int main()
             break;
         case 3:
             selection_sort();
+            break;
+        case 4:
+            insertion_sort();
+            break;
+        case 5:
+            bubble_sort();
             break;
         case 0:
             break;
