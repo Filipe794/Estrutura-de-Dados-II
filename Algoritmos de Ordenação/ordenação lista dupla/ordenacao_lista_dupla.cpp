@@ -99,29 +99,42 @@ void menu()
 {
     printf("1 - Adicionar um novo elemento\n");
     printf("2 - Imprimir a lista\n");
-    printf("3 - Embaralhar a lista\n");
-    printf("4 - Ordenar por Bubble Sort\n");
-    printf("5 - Ordenar por Selection Sort\n");
-    printf("6 - Ordenar por Insertion Sort\n");
+    printf("3 - Ordenar por Bubble Sort\n");
+    printf("4 - Ordenar por Selection Sort\n");
+    printf("5 - Ordenar por Insertion Sort\n");
     printf("0 - Sair\n");
 }
-void troca_insertion(No *aux, No *troca, No *proximo, No *anterior)
+void troca_insertion(No *aux, No *troca)
 {
+    No *prox_troca = troca->proximo;
+    No *ant_troca = troca->anterior;
+    No *prox_aux = aux->proximo;
+    No *ant_aux = aux->anterior;
+
+    if (troca == fim)
+        fim = troca->anterior;
+
+    // atualizando ponteiros dos nós aux e troca
     if (aux == cabeca)
     {
-        troca->proximo = cabeca;
+        troca->anterior = NULL;
+        troca->proximo = aux;
+        aux->anterior = troca;
         cabeca = troca;
-        anterior->proximo = proximo;
     }
     else
     {
+        troca->anterior = aux->anterior;
         troca->proximo = aux;
-        anterior->proximo = proximo;
-        anterior = aux->anterior;
-        if (anterior != NULL)
-        {
-            anterior->proximo = troca;
-        }
+        ant_aux->proximo = troca;
+        aux->anterior = troca;
+    }
+    // atualizando os nós adjacentes à aux e troca
+    if(prox_troca != NULL){
+        prox_troca->anterior = ant_troca;
+    }
+    if(ant_troca != NULL){
+        ant_troca->proximo = prox_troca;
     }
 }
 void insertion_sort()
@@ -130,7 +143,6 @@ void insertion_sort()
         return;
 
     No *troca = cabeca->proximo;
-    No *anterior = troca->anterior;
     No *aux = cabeca;
     No *proximo = troca->proximo;
 
@@ -140,14 +152,13 @@ void insertion_sort()
         {
             if (strcmp(aux->nome, troca->nome) > 0)
             {
-                troca_posicao(aux, troca);
+                troca_insertion(aux, troca);
                 break;
             }
             aux = aux->proximo;
         }
         troca = proximo;
         aux = cabeca;
-        anterior = troca->anterior;
         if (troca != NULL)
             proximo = troca->proximo;
     }

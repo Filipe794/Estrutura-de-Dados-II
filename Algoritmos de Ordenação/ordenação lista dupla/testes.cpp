@@ -137,6 +137,39 @@ void selection_sort()
         inserir = inserir->proximo;
     }
 }
+void troca_insertion(No *aux, No *troca)
+{
+    No *prox_troca = troca->proximo;
+    No *ant_troca = troca->anterior;
+    No *prox_aux = aux->proximo;
+    No *ant_aux = aux->anterior;
+
+    if (troca == fim)
+        fim = troca->anterior;
+
+    // atualizando ponteiros dos nós aux e troca
+    if (aux == cabeca)
+    {
+        troca->anterior = NULL;
+        troca->proximo = aux;
+        aux->anterior = troca;
+        cabeca = troca;
+    }
+    else
+    {
+        troca->anterior = aux->anterior;
+        troca->proximo = aux;
+        ant_aux->proximo = troca;
+        aux->anterior = troca;
+    }
+    // atualizando os nós adjacentes à aux e troca
+    if(prox_troca != NULL){
+        prox_troca->anterior = ant_troca;
+    }
+    if(ant_troca != NULL){
+        ant_troca->proximo = prox_troca;
+    }
+}
 void insertion_sort()
 {
     if (cabeca == NULL || cabeca->proximo == NULL)
@@ -152,7 +185,7 @@ void insertion_sort()
         {
             if (troca->valor < aux->valor)
             {
-                troca_posicao(troca, aux);
+                troca_insertion(aux, troca);
                 break;
             }
             aux = aux->proximo;
@@ -202,9 +235,9 @@ int main()
         case 1:
             srand(time(NULL));
             int num;
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 30; i++)
             {
-                num = rand() % 8;
+                num = rand() % 27;
                 inserir(num);
             }
             break;
