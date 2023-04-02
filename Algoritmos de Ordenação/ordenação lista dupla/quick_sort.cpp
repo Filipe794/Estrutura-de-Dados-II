@@ -130,9 +130,10 @@ void quick_sort(lista *lst)
   {
     return;
   }
-  int metade = lst->tamanho/2;
+  int metade = lst->tamanho / 2;
   celula *pivo = lst->inicio;
-  for(int i = 0; i< metade; i++){
+  for (int i = 0; i < metade; i++)
+  {
     pivo = pivo->prox;
   }
 
@@ -141,24 +142,29 @@ void quick_sort(lista *lst)
 
   celula *aux = lst->inicio;
   celula *elemento = NULL;
-  
-  while(aux != NULL){
+
+  while (aux != NULL)
+  {
     elemento = aux;
     aux = aux->prox;
-    if(elemento == pivo){
+    if (elemento == pivo)
+    {
       continue;
     }
-    remover(lst,elemento);
-    if(elemento->num < pivo->num){
+    remover(lst, elemento);
+    if (elemento->num < pivo->num)
+    {
       inserir_inicio(&menores, elemento);
-    }else{
-      inserir_inicio(&maiores,elemento);
+    }
+    else
+    {
+      inserir_inicio(&maiores, elemento);
     }
   }
   quick_sort(&menores);
-  anexar_inicio(lst,&menores);
+  anexar_inicio(lst, &menores);
   quick_sort(&maiores);
-  anexar_fim(lst,&maiores);
+  anexar_fim(lst, &maiores);
 }
 void imprimir(lista *lst)
 {
