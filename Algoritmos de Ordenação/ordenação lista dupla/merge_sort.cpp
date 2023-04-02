@@ -1,32 +1,174 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 
-typedef struct cel {
+typedef struct cel
+{
   int num;
-  cel *ant;
-  cel *prox;
+  cel *ant = NULL;
+  cel *prox = NULL;
 } celula;
 
-typedef struct list {
-  celula *inicio;
-  celula *fim;
-  int tamanho;
+typedef struct list
+{
+  celula *inicio = NULL;
+  celula *fim = NULL;
+  int tamanho = 0;
 } lista;
 
-void anexar_fim(lista *nova, lista *lista) {
+void anexar_fim(lista *nova, lista *lista)
+{
   nova->tamanho += lista->tamanho;
   nova->fim->prox = lista->inicio;
   lista->inicio->ant = nova->fim;
   nova->fim = lista->fim;
-  delete lista;
 }
+void inserir_inicio(lista *lst, celula *elemento)
+{
+  if ((lst == NULL) || (elemento == NULL))
+  {
+    return;
+  }
+  if (lst->tamanho == 0)
+  {
+    lst->inicio = elemento;
+    lst->fim = elemento;
+    lst->tamanho = 1;
+    elemento->ant = NULL;
+    elemento->prox = NULL;
+    return;
+  }
+  elemento->ant = NULL;
+  elemento->prox = lst->inicio;
+  lst->inicio->ant = elemento;
+  lst->inicio = elemento;
+  lst->tamanho++;
+}
+void inserir_fim(lista *lst, celula *elemento)
+{
+  if ((lst == NULL) || (elemento == NULL))
+  {
+    return;
+  }
+  if (lst->tamanho == 0)
+  {
+    lst->inicio = elemento;
+    lst->fim = elemento;
+    lst->tamanho = 1;
+    elemento->ant = NULL;
+    elemento->prox = NULL;
+    return;
+  }
+  elemento->prox = NULL;
+  elemento->ant = lst->fim;
+  lst->fim->prox = elemento;
+  lst->fim = elemento;
+  lst->tamanho++;
+}
+void remover(lista *lst, celula *elemento)
+{
+  if ((lst == NULL) || (elemento == NULL) || (lst->tamanho == 0))
+  {
+    return;
+  }
+  if ((lst->inicio == elemento) && (lst->fim == elemento))
+  {
+    lst->tamanho = 0;
+    lst->inicio = NULL;
+    lst->fim = NULL;
+    return;
+  }
 
-void divide(lista *lista1, lista *lista2) {
-  int tam_metade = lista1->tamanho / 2;
+  lst->tamanho--;
+
+  if (lst->inicio == elemento)
+  {
+    lst->inicio = lst->inicio->prox;
+    lst->inicio->ant = NULL;
+    elemento->prox = NULL;
+    return;
+  }
+
+  if (lst->fim == elemento)
+  {
+    lst->fim = lst->fim->ant;
+    lst->fim->prox = NULL;
+    elemento->ant = NULL;
+    return;
+  }
+
+  celula *ant_elem = elemento->ant;
+  celula *prox_elem = elemento->prox;
+  ant_elem->prox = prox_elem;
+  prox_elem->ant = ant_elem;
+
+  elemento->ant = NULL;
+  elemento->prox = NULL;
+}
+lista *merge(lista *lista1, lista *lista2)
+{
+  if ((lista1 == NULL) && (lista2 == NULL))
+  {
+    return NULL;
+  }
+
+  if ((lista1 != NULL) && (lista2 == NULL))
+  {
+    return lista1;
+  }
+
+  if ((lista1 == NULL) && (lista2 != NULL))
+  {
+    return lista2;
+  }
+  lista *nova = new lista;
+
+
+  while ((lista1->tamanho > 0) && (lista2->tamanho > 0))
+  {
+    int num1 = lista1->inicio->num;
+    int num2 = lista2->inicio->num;
+
+    celula *elemento;
+
+    if (num1 < num2)
+    {
+      elemento = lista1->inicio;
+      remover(lista1, elemento);
+    }
+    else
+    {
+      elemento = lista2->inicio;
+      remover(lista2, elemento);
+    }
+    inserir_fim(nova, elemento);
+  }
+  if (lista1->tamanho > 0)
+  {
+    anexar_fim(nova, lista1);
+  }
+  if (lista2->tamanho > 0)
+  {
+    anexar_fim(nova, lista2);
+  }
+  return nova;
+}
+lista *merge_sort(lista *lista1)
+{
+  if ((lista1 == NULL) || (lista1->tamanho == 0))
+  {
+    return NULL;
+  }
+  if (lista1->tamanho == 1)
+  {
+    return lista1;
+  }
+
+  lista *lista2 = new lista;
+  int metade = lista1->tamanho / 2;
   celula *inicio2 = lista1->inicio;
-  for (int i = 0; i < tam_metade; i++) {
+  for (int i = 0; i < metade; i++)
+  {
     inicio2 = inicio2->prox;
   }
 
@@ -36,102 +178,44 @@ void divide(lista *lista1, lista *lista2) {
 
   lista2->inicio = inicio2;
   lista2->fim = lista1->fim;
-  lista2->tamanho = lista1->tamanho - tam_metade;
-
   lista1->fim = fim1;
-  lista1->tamanho = tam_metade;
+
+  lista2->tamanho = lista1->tamanho - metade;
+  lista1->tamanho = metade;
+
+  lista1 = merge_sort(lista1);
+  lista2 = merge_sort(lista2);
+
+  lista *resultado = merge(lista1, lista2);
+
+  return resultado;
 }
-
-void inserir_fim(lista *lista, celula *elemento)
-{
-  lista->fim->prox = elemento;
-  elemento->ant = lista->fim;
-  lista->fim = elemento;
-}
-
-celula* remover_inicio(lista *lista){
-  celula *elemento = lista->inicio;
-  elemento->prox = NULL;
-  lista->inicio = lista->inicio->prox;
-  lista->inicio->ant = NULL;
-  return elemento;
-}
-
-lista *merge(lista *lista1, lista *lista2) {
-  lista *nova = new lista;
-
-  while ((lista1->tamanho > 0) && (lista2->tamanho > 0)) {
-    int num1 = lista1->inicio->num;
-    int num2 = lista2->inicio->num;
-    celula *elemento;
-    if (num1 < num2) {
-      elemento = remover_inicio(lista1);
-    } else {
-      elemento = remover_inicio(lista2);
-    }
-    inserir_fim(nova, elemento);
-  }
-  if (lista1->tamanho > 0) {
-    anexar_fim(nova, lista1);
-  }
-
-  if (lista2->tamanho > 0) {
-    anexar_fim(nova, lista2);
-  }
-
-  return nova;
-}
-
 void menu()
 {
-    printf("1 - Inserir elemento\n");
-    printf("2 - Imprimir a lista\n");
-    printf("3 - Ordenar lista\n");
-    printf("0 - Sair\n");
+  printf("1 - Inserir elemento\n");
+  printf("2 - Imprimir a lista\n");
+  printf("3 - Ordenar lista\n");
+  printf("0 - Sair\n");
+}
+void gerar_aleatorio(lista *lst, int qnt){
+  celula *elem;
+  for (int i = 0; i < qnt; i++) {
+    elem = new celula;
+    elem->num = rand() % (qnt-1);
+    inserir_inicio(lst, elem);
+  }
+}
+void imprimir(lista *lst) {
+  if (lst == NULL) {
+    return;
+  }
+  celula *aux = lst->inicio;
+  while (aux != NULL) {
+    printf("%d -> ", aux->num);
+    aux = aux->prox;
+  }
+  printf("NULL\n");
 }
 
-// Carro *aux = *cabeca;
-//     if (strcmp(carro->nome, aux->nome) < 0)  // Inserindo inicio
-//       carro->prox = aux;
-//       carro->ant = aux->ant;
-//       aux->ant = carro;
-//       *cabeca = carro;
 
-// void inserir_inicio(lista* lista,celula *elemento){
-//     lista* aux = lista;
-//     //   carro->prox = aux;
-//     //   carro->ant = aux->ant;
-//     //   aux->ant = carro;
-//     //   *cabeca = carro;
-// }
-int main()
-{   
-
-    int opcao;
-    lista *lista_1 = NULL;
-    lista *lista_2 = NULL;
-    do
-    {
-        menu();
-        scanf("%d", &opcao);
-
-        switch (opcao)
-        {
-        case 1:
-            // inserir_fim();
-            break;
-        case 2:
-            // imprimir();
-            break;
-        case 3:
-            // merge();
-            break;
-        case 0:
-            break;
-        default:
-            printf("Opcao invalida!\n");
-        }
-    } while (opcao != 0);
-
-    return 0;
 }
