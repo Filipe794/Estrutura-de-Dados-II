@@ -9,12 +9,16 @@ typedef struct No
     struct No *proximo;
     struct No *anterior;
 } No;
-No *cabeca = NULL;
-No *fim = NULL;
-
-void imprimir()
+typedef struct list
 {
-    No *inicio = cabeca;
+    No *cabeca = NULL;
+    No *fim = NULL;
+    int tamanho = 0;
+} lista;
+
+void imprimir(lista *lst)
+{
+    No *inicio = lst->cabeca;
     while (inicio != NULL)
     {
         printf("%s ->  ", inicio->nome);
@@ -29,27 +33,42 @@ void ler_nome(No *Novo)
     printf("\nDigite um nome: ");
     scanf("%[^\n]s", Novo->nome);
 }
-void inserir()
+No *cria_elemento()
 {
-    No *Novo = new No;
-    if (cabeca == NULL)
+    No *elemento = new No;
+    elemento->anterior = NULL;
+    elemento->proximo = NULL;
+    fflush(stdin);
+    printf("\nDigite um nome: ");
+    scanf("%[^\n]s", elemento->nome);
+    return elemento;
+}
+void inserir_inicio(lista *lst, No *elemento)
+{
+    if ((lst == NULL) || (elemento == NULL))
     {
-        ler_nome(Novo);
-        Novo->proximo = NULL;
-        Novo->anterior = NULL;
-        cabeca = Novo;
-        fim = Novo;
         return;
     }
-    ler_nome(Novo);
-    Novo->proximo = cabeca;
-    Novo->anterior = cabeca->anterior;
-    cabeca->anterior = Novo;
-    cabeca = Novo;
+
+    if (lst->tamanho == 0)
+    {
+        lst->cabeca = elemento;
+        lst->fim = elemento;
+        lst->tamanho = 1;
+        elemento->anterior = NULL;
+        elemento->proximo = NULL;
+        return;
+    }
+
+    elemento->anterior = NULL;
+    elemento->proximo = lst->cabeca;
+    lst->cabeca->anterior = elemento;
+    lst->cabeca = elemento;
+    lst->tamanho++;
 }
-void imprimir_inverso()
+void imprimir_inverso(lista *lst)
 {
-    No *aux = fim;
+    No *aux = lst->fim;
     while (aux != NULL)
     {
         printf("%s ->  ", aux->nome);
@@ -58,23 +77,87 @@ void imprimir_inverso()
     printf("NULL");
     printf("\n\n");
 }
-void troca_posicao(No *elem1, No *elem2)
+void remover(lista *lst, No *elemento)
 {
-    if (cabeca == NULL || elem1 == NULL || elem2 == NULL)
+    if ((lst == NULL) || (elemento == NULL) || (lst->tamanho == 0))
     {
         return;
     }
 
-    if (elem2 == fim)
-        fim = elem1;
-
-    if (cabeca == elem1)
+    if ((lst->cabeca == elemento) && (lst->fim == elemento))
     {
-        cabeca = elem2;
+        lst->tamanho = 0;
+        lst->cabeca = NULL;
+        lst->fim = NULL;
+        return;
     }
-    else if (cabeca == elem2)
+
+    lst->tamanho--;
+
+    if (lst->cabeca == elemento)
     {
-        cabeca = elem1;
+        lst->cabeca = lst->cabeca->proximo;
+        lst->cabeca->anterior = NULL;
+        elemento->proximo = NULL;
+        return;
+    }
+
+    if (lst->fim == elemento)
+    {
+        lst->fim = lst->fim->anterior;
+        lst->fim->proximo = NULL;
+        elemento->anterior = NULL;
+        return;
+    }
+
+    No *antElem = elemento->anterior;
+    No *proxElem = elemento->proximo;
+    antElem->proximo = proxElem;
+    proxElem->anterior = antElem;
+
+    elemento->anterior = NULL;
+    elemento->proximo = NULL;
+}
+void inserir_fim(lista *lst, No *elemento)
+{
+    if ((lst == NULL) || (elemento == NULL))
+    {
+        return;
+    }
+
+    if (lst->tamanho == 0)
+    {
+        lst->cabeca = elemento;
+        lst->fim = elemento;
+        lst->tamanho = 1;
+        elemento->anterior = NULL;
+        elemento->proximo = NULL;
+        return;
+    }
+
+    elemento->proximo = NULL;
+    elemento->anterior = lst->fim;
+    lst->fim->proximo = elemento;
+    lst->fim = elemento;
+    lst->tamanho++;
+}
+void troca_posicao(lista *lst, No *elem1, No *elem2)
+{
+    if ((lst->cabeca == NULL) || (elem1 == NULL) || (elem2 == NULL))
+    {
+        return;
+    }
+
+    if (elem2 == lst->fim)
+        lst->fim = elem1;
+
+    if (lst->cabeca == elem1)
+    {
+        lst->cabeca = elem2;
+    }
+    else if (lst->cabeca == elem2)
+    {
+        lst->cabeca = elem1;
     }
 
     if (elem1->anterior != NULL)
@@ -114,23 +197,23 @@ void menu()
     printf("5 - Ordenar por Insertion Sort\n");
     printf("0 - Sair\n");
 }
-void troca_insertion(No *aux, No *troca)
+void troca_insertion(lista *lst, No *aux, No *troca)
 {
     No *prox_troca = troca->proximo;
     No *ant_troca = troca->anterior;
     No *prox_aux = aux->proximo;
     No *ant_aux = aux->anterior;
 
-    if (troca == fim)
-        fim = troca->anterior;
+    if (troca == lst->fim)
+        lst->fim = troca->anterior;
 
     // atualizando ponteiros dos nós aux e troca
-    if (aux == cabeca)
+    if (aux == lst->cabeca)
     {
         troca->anterior = NULL;
         troca->proximo = aux;
         aux->anterior = troca;
-        cabeca = troca;
+        lst->cabeca = troca;
     }
     else
     {
@@ -149,13 +232,13 @@ void troca_insertion(No *aux, No *troca)
         ant_troca->proximo = prox_troca;
     }
 }
-void insertion_sort()
+void insertion_sort(lista *lst)
 {
-    if (cabeca == NULL || cabeca->proximo == NULL)
+    if ((lst->cabeca == NULL) || (lst->cabeca->proximo == NULL))
         return;
 
-    No *troca = cabeca->proximo;
-    No *aux = cabeca;
+    No *troca = lst->cabeca->proximo;
+    No *aux = lst->cabeca;
     No *proximo = troca->proximo;
 
     while (troca != NULL)
@@ -164,30 +247,30 @@ void insertion_sort()
         {
             if (strcmp(aux->nome, troca->nome) > 0)
             {
-                troca_insertion(aux, troca);
+                troca_insertion(lst,aux, troca);
                 break;
             }
             aux = aux->proximo;
         }
         troca = proximo;
-        aux = cabeca;
+        aux = lst->cabeca;
         if (troca != NULL)
             proximo = troca->proximo;
     }
 }
-void troca_proximo(No *aux)
+void troca_proximo(lista *lst,No *aux)
 {
     No *temp = aux->proximo;
     aux->proximo = temp->proximo;
     temp->proximo = aux;
 
-    if (aux == cabeca)
+    if (aux == lst->cabeca)
     {
-        cabeca = temp;
+        lst->cabeca = temp;
     }
     else
     {
-        No *anterior = cabeca;
+        No *anterior = lst->cabeca;
         while (anterior->proximo != aux)
         {
             anterior = anterior->proximo;
@@ -195,22 +278,22 @@ void troca_proximo(No *aux)
         anterior->proximo = temp;
     }
 }
-void bubble_sort()
+void bubble_sort(lista *lst)
 {
     int cont_troca;
     No *aux = NULL;
     No *ultimo = NULL;
-    if (cabeca == NULL || cabeca->proximo == NULL)
+    if ((lst->cabeca == NULL) || (lst->cabeca->proximo == NULL))
         return;
     do
     {
         cont_troca = 0;
-        aux = cabeca;
+        aux = lst->cabeca;
         while (aux->proximo != ultimo)
         {
             if (strcmp(aux->nome, aux->proximo->nome) > 0)
             {
-                troca_posicao(aux, aux->proximo);
+                troca_posicao(lst,aux, aux->proximo);
                 cont_troca = 1;
             }
             else
@@ -221,12 +304,12 @@ void bubble_sort()
         ultimo = aux;
     } while (cont_troca != 0);
 }
-void selection_sort()
+void selection_sort(lista *lst)
 {
-    if (cabeca == NULL || cabeca->proximo == NULL)
+    if ((lst->cabeca == NULL) || (lst->cabeca->proximo == NULL))
         return;
 
-    No *menor, *inserir = cabeca;
+    No *menor, *inserir = lst->cabeca;
     No *aux = menor->proximo;
 
     while (inserir->proximo != NULL)
@@ -244,14 +327,109 @@ void selection_sort()
         }
         if (menor != inserir)
         {
-            troca_posicao(inserir, menor);
+            troca_posicao(lst,inserir, menor);
             inserir = menor;
         }
         inserir = inserir->proximo;
     }
 }
+void anexar_fim(lista *nova, lista *lista)
+{
+    nova->tamanho += lista->tamanho;
+    nova->fim->proximo = lista->cabeca;
+    lista->cabeca->anterior = nova->fim;
+    nova->fim = lista->fim;
+}
+lista *merge_sort(lista *lista1)
+{
+    if ((lista1 == NULL) || (lista1->tamanho == 0))
+    {
+        return NULL;
+    }
+
+    if (lista1->tamanho == 1)
+    {
+        return lista1;
+    }
+
+    lista *lista2 = new lista;
+    int tam_metade = lista1->tamanho / 2;
+    No *inicio2 = lista1->cabeca;
+    for (int i = 0; i < tam_metade; i++)
+    {
+        inicio2 = inicio2->proximo;
+    }
+
+    No *fim1 = inicio2->anterior;
+    fim1->proximo = NULL;
+    inicio2->anterior = NULL;
+
+    lista2->cabeca = inicio2;
+    lista2->fim = lista1->fim;
+    lista2->tamanho = lista1->tamanho - tam_metade;
+
+    lista1->fim = fim1;
+    lista1->tamanho = tam_metade;
+
+    lista1 = merge_sort(lista1);
+
+    lista2 = merge_sort(lista2);
+
+    lista *res = merge(lista1, lista2);
+
+    return res;
+}
+lista *merge(lista *lista1, lista *lista2)
+{
+    if ((lista1 == NULL) && (lista2 == NULL))
+    {
+        return NULL;
+    }
+
+    if ((lista1 != NULL) && (lista2 == NULL))
+    {
+        return lista1;
+    }
+
+    if ((lista1 == NULL) && (lista2 != NULL))
+    {
+        return lista2;
+    }
+
+    lista *nova = new lista;
+
+    while ((lista1->tamanho > 0) && (lista2->tamanho > 0))
+    {
+        No *nome1 = lista1->cabeca;
+        No *nome2 = lista2->cabeca;
+        No *elemento;
+        if (strcmp(nome2->nome, nome1->nome) > 0)
+        {
+            elemento = lista1->cabeca;
+            remover(lista1, elemento);
+        }
+        else
+        {
+            elemento = lista2->cabeca;
+            remover(lista2, elemento);
+        }
+        inserir_fim(nova, elemento);
+    }
+    if (lista1->tamanho > 0)
+    {
+        anexar_fim(nova, lista1);
+    }
+
+    if (lista2->tamanho > 0)
+    {
+        anexar_fim(nova, lista2);
+    }
+
+    return nova;
+}
 int main()
 {
+    lista *lst = new lista;
     int opcao;
     do
     {
@@ -261,22 +439,22 @@ int main()
         switch (opcao)
         {
         case 1:
-            inserir();
+            inserir_inicio(lst, cria_elemento());
             break;
         case 2:
             printf("a partir da cabeca\n");
-            imprimir();
+            imprimir(lst);
             printf("a partir do fim\n");
-            imprimir_inverso();
+            imprimir_inverso(lst);
             break;
         case 3:
-            bubble_sort();
+            bubble_sort(lst);
             break;
         case 4:
-            selection_sort();
+            selection_sort(lst);
             break;
         case 5:
-            insertion_sort();
+            insertion_sort(lst);
             break;
         case 0:
             break;
