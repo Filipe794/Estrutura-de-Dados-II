@@ -25,8 +25,9 @@ void imprimir()
 }
 void ler_nome(No *Novo)
 {
+    fflush(stdin);
     printf("\nDigite um nome: ");
-    scanf("%s", Novo->nome);
+    scanf("%[^\n]s", Novo->nome);
 }
 void inserir()
 {
