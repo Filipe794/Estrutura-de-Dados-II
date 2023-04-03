@@ -34,6 +34,8 @@ void inserir()
     if (cabeca == NULL)
     {
         ler_nome(Novo);
+        Novo->proximo = NULL;
+        Novo->anterior = NULL;
         cabeca = Novo;
         fim = Novo;
         return;
@@ -57,27 +59,34 @@ void imprimir_inverso()
 }
 void troca_posicao(No *elem1, No *elem2)
 {
-   if (cabeca == NULL || elem1 == NULL || elem2 == NULL) {
+    if (cabeca == NULL || elem1 == NULL || elem2 == NULL)
+    {
         return;
     }
 
-    if(elem2 == fim) fim = elem1;
+    if (elem2 == fim)
+        fim = elem1;
 
-    if (cabeca == elem1) {
+    if (cabeca == elem1)
+    {
         cabeca = elem2;
-    } else if (cabeca == elem2) {
+    }
+    else if (cabeca == elem2)
+    {
         cabeca = elem1;
     }
 
-    if (elem1->anterior != NULL) {
+    if (elem1->anterior != NULL)
+    {
         elem1->anterior->proximo = elem2;
     }
 
-    if (elem2->anterior != NULL) {
+    if (elem2->anterior != NULL)
+    {
         elem2->anterior->proximo = elem1;
     }
 
-    No* temp = elem1->anterior;
+    No *temp = elem1->anterior;
     elem1->anterior = elem2->anterior;
     elem2->anterior = temp;
 
@@ -85,14 +94,15 @@ void troca_posicao(No *elem1, No *elem2)
     elem1->proximo = elem2->proximo;
     elem2->proximo = temp;
 
-    if (elem1->proximo != NULL) {
+    if (elem1->proximo != NULL)
+    {
         elem1->proximo->anterior = elem1;
     }
 
-    if (elem2->proximo != NULL) {
+    if (elem2->proximo != NULL)
+    {
         elem2->proximo->anterior = elem2;
     }
-    
 }
 void menu()
 {
@@ -129,10 +139,12 @@ void troca_insertion(No *aux, No *troca)
         aux->anterior = troca;
     }
     // atualizando os nós adjacentes à aux e troca
-    if(prox_troca != NULL){
+    if (prox_troca != NULL)
+    {
         prox_troca->anterior = ant_troca;
     }
-    if(ant_troca != NULL){
+    if (ant_troca != NULL)
+    {
         ant_troca->proximo = prox_troca;
     }
 }
