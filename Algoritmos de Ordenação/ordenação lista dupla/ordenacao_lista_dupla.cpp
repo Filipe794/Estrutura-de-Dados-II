@@ -195,6 +195,8 @@ void menu()
     printf("3 - Ordenar por Bubble Sort\n");
     printf("4 - Ordenar por Selection Sort\n");
     printf("5 - Ordenar por Insertion Sort\n");
+    printf("6 - Ordenar por Quick Sort\n");
+    printf("7 - Ordenar por Merge Sort\n");
     printf("0 - Sair\n");
 }
 void troca_insertion(lista *lst, No *aux, No *troca)
@@ -247,7 +249,7 @@ void insertion_sort(lista *lst)
         {
             if (strcmp(aux->nome, troca->nome) > 0)
             {
-                troca_insertion(lst,aux, troca);
+                troca_insertion(lst, aux, troca);
                 break;
             }
             aux = aux->proximo;
@@ -258,7 +260,7 @@ void insertion_sort(lista *lst)
             proximo = troca->proximo;
     }
 }
-void troca_proximo(lista *lst,No *aux)
+void troca_proximo(lista *lst, No *aux)
 {
     No *temp = aux->proximo;
     aux->proximo = temp->proximo;
@@ -293,7 +295,7 @@ void bubble_sort(lista *lst)
         {
             if (strcmp(aux->nome, aux->proximo->nome) > 0)
             {
-                troca_posicao(lst,aux, aux->proximo);
+                troca_posicao(lst, aux, aux->proximo);
                 cont_troca = 1;
             }
             else
@@ -327,7 +329,7 @@ void selection_sort(lista *lst)
         }
         if (menor != inserir)
         {
-            troca_posicao(lst,inserir, menor);
+            troca_posicao(lst, inserir, menor);
             inserir = menor;
         }
         inserir = inserir->proximo;
@@ -339,45 +341,6 @@ void anexar_fim(lista *nova, lista *lista)
     nova->fim->proximo = lista->cabeca;
     lista->cabeca->anterior = nova->fim;
     nova->fim = lista->fim;
-}
-lista *merge_sort(lista *lista1)
-{
-    if ((lista1 == NULL) || (lista1->tamanho == 0))
-    {
-        return NULL;
-    }
-
-    if (lista1->tamanho == 1)
-    {
-        return lista1;
-    }
-
-    lista *lista2 = new lista;
-    int tam_metade = lista1->tamanho / 2;
-    No *inicio2 = lista1->cabeca;
-    for (int i = 0; i < tam_metade; i++)
-    {
-        inicio2 = inicio2->proximo;
-    }
-
-    No *fim1 = inicio2->anterior;
-    fim1->proximo = NULL;
-    inicio2->anterior = NULL;
-
-    lista2->cabeca = inicio2;
-    lista2->fim = lista1->fim;
-    lista2->tamanho = lista1->tamanho - tam_metade;
-
-    lista1->fim = fim1;
-    lista1->tamanho = tam_metade;
-
-    lista1 = merge_sort(lista1);
-
-    lista2 = merge_sort(lista2);
-
-    lista *res = merge(lista1, lista2);
-
-    return res;
 }
 lista *merge(lista *lista1, lista *lista2)
 {
@@ -426,6 +389,45 @@ lista *merge(lista *lista1, lista *lista2)
     }
 
     return nova;
+}
+lista *merge_sort(lista *lista1)
+{
+    if ((lista1 == NULL) || (lista1->tamanho == 0))
+    {
+        return NULL;
+    }
+
+    if (lista1->tamanho == 1)
+    {
+        return lista1;
+    }
+
+    lista *lista2 = new lista;
+    int tam_metade = lista1->tamanho / 2;
+    No *inicio2 = lista1->cabeca;
+    for (int i = 0; i < tam_metade; i++)
+    {
+        inicio2 = inicio2->proximo;
+    }
+
+    No *fim1 = inicio2->anterior;
+    fim1->proximo = NULL;
+    inicio2->anterior = NULL;
+
+    lista2->cabeca = inicio2;
+    lista2->fim = lista1->fim;
+    lista2->tamanho = lista1->tamanho - tam_metade;
+
+    lista1->fim = fim1;
+    lista1->tamanho = tam_metade;
+
+    lista1 = merge_sort(lista1);
+
+    lista2 = merge_sort(lista2);
+
+    lista *res = merge(lista1, lista2);
+
+    return res;
 }
 int main()
 {

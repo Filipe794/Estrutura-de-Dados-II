@@ -66,7 +66,7 @@ No *novo_no()
 }
 void anexar_inicio(lista *lst, lista *anexar)
 {
-    if ((lst == NULL) || (lst->tamanho == 0))
+    if ((lst == NULL) || (lst->tamanho == 0)|| (anexar == NULL))
     {
         return;
     }
@@ -76,6 +76,10 @@ void anexar_inicio(lista *lst, lista *anexar)
 }
 void anexar_fim(lista *lst, lista *anexar)
 {
+    if ((lst == NULL) || (lst->tamanho == 0)|| (anexar == NULL))
+    {
+        return;
+    }
     lst->tamanho += anexar->tamanho;
     lst->fim->proximo = anexar->cabeca;
     lst->fim = anexar->fim;
