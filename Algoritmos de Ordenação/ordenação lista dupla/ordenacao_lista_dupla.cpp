@@ -188,17 +188,6 @@ void troca_posicao(lista *lst, No *elem1, No *elem2)
         elem2->proximo->anterior = elem2;
     }
 }
-void menu()
-{
-    printf("1 - Adicionar um novo elemento\n");
-    printf("2 - Imprimir a lista\n");
-    printf("3 - Ordenar por Bubble Sort\n");
-    printf("4 - Ordenar por Selection Sort\n");
-    printf("5 - Ordenar por Insertion Sort\n");
-    printf("6 - Ordenar por Quick Sort\n");
-    printf("7 - Ordenar por Merge Sort\n");
-    printf("0 - Sair\n");
-}
 void troca_insertion(lista *lst, No *aux, No *troca)
 {
     No *prox_troca = troca->proximo;
@@ -337,6 +326,10 @@ void selection_sort(lista *lst)
 }
 void anexar_fim(lista *nova, lista *lista)
 {
+    if ((lista == NULL) || (lista->tamanho == 0))
+    {
+        return;
+    }
     nova->tamanho += lista->tamanho;
     nova->fim->proximo = lista->cabeca;
     lista->cabeca->anterior = nova->fim;
@@ -482,6 +475,17 @@ void quick_sort(lista *lst)
     quick_sort(&maiores);
     anexar_fim(lst, &maiores);
 }
+void menu()
+{
+    printf("1 - Adicionar um novo elemento\n");
+    printf("2 - Imprimir a lista\n");
+    printf("3 - Ordenar por Bubble Sort\n");
+    printf("4 - Ordenar por Selection Sort\n");
+    printf("5 - Ordenar por Insertion Sort\n");
+    printf("6 - Ordenar por Merge Sort\n");
+    printf("7 - Ordenar por Quick Sort\n");
+    printf("0 - Sair\n");
+}
 int main()
 {
     lista *lst = new lista;
@@ -510,6 +514,12 @@ int main()
             break;
         case 5:
             insertion_sort(lst);
+            break;
+        case 6:
+            lst = merge_sort(lst);
+            break;
+        case 7:
+            quick_sort(lst);
             break;
         case 0:
             break;

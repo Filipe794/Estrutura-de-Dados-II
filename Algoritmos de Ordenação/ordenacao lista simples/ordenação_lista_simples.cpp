@@ -16,7 +16,7 @@ typedef struct lista
 } lista;
 No *prev(lista *lst, No *referencia)
 {
-    if (referencia == NULL || referencia == lst->cabeca)
+    if ((referencia == NULL) || (referencia == lst->cabeca) || (lst == NULL))
         return NULL;
     No *aux = lst->cabeca;
     while (aux != NULL)
@@ -64,25 +64,25 @@ No *novo_no()
     ler_nome(Novo);
     return Novo;
 }
-void anexar_inicio(lista *lst, lista *anexar)
+void anexar_inicio(lista *lst, lista *nova)
 {
-    if ((lst == NULL) || (lst->tamanho == 0)|| (anexar == NULL))
+    if ((nova == NULL) || (nova->tamanho == 0)|| (lst == NULL))
     {
         return;
     }
-    lst->tamanho += anexar->tamanho;
-    anexar->fim->proximo = lst->cabeca;
-    lst->cabeca = anexar->cabeca;
+    lst->tamanho += nova->tamanho;
+    nova->fim->proximo = lst->cabeca;
+    lst->cabeca = nova->cabeca;
 }
-void anexar_fim(lista *lst, lista *anexar)
+void anexar_fim(lista *lst, lista *nova)
 {
-    if ((lst == NULL) || (lst->tamanho == 0)|| (anexar == NULL))
+    if ((nova == NULL)||(nova->tamanho == 0))
     {
         return;
     }
-    lst->tamanho += anexar->tamanho;
-    lst->fim->proximo = anexar->cabeca;
-    lst->fim = anexar->fim;
+    lst->tamanho += nova->tamanho;
+    lst->fim->proximo = nova->cabeca;
+    lst->fim = nova->fim;
 }
 void inserir_fim(lista *lst, No *Novo)
 {
@@ -107,13 +107,14 @@ void inserir_fim(lista *lst, No *Novo)
 }
 void inserir_inicio(lista *lst, No *Novo)
 {
-    if (lst == NULL)
+    if ((lst == NULL)||(Novo == NULL))
         return;
     if (lst->tamanho == 0)
     {
         lst->cabeca = Novo;
         lst->fim = Novo;
         lst->tamanho = 1;
+        Novo->proximo = NULL;
         return;
     }
     Novo->proximo = lst->cabeca;

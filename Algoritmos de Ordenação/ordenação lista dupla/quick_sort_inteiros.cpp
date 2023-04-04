@@ -16,27 +16,27 @@ typedef struct list
   int tamanho = 0;
 } lista;
 
-void anexar_inicio(lista *nova, lista *lista)
+void anexar_inicio(lista *lst, lista *nova)
 {
-  if ((lista == NULL) || (lista->tamanho == 0))
+  if ((nova == NULL) || (nova->tamanho == 0))
   {
     return;
   }
-  nova->tamanho += lista->tamanho;
-  nova->inicio->ant = lista->fim;
-  lista->fim->prox = nova->inicio;
-  nova->inicio = lista->inicio;
+  lst->tamanho += nova->tamanho;
+  lst->inicio->ant = nova->fim;
+  nova->fim->prox = lst->inicio;
+  lst->inicio = nova->inicio;
 }
-void anexar_fim(lista *nova, lista *lista)
+void anexar_fim(lista *lst, lista *nova)
 {
-  if ((lista == NULL) || (lista->tamanho == 0))
+  if ((nova == NULL) || (nova->tamanho == 0))
   {
     return;
   }
-  nova->tamanho += lista->tamanho;
-  nova->fim->prox = lista->inicio;
-  lista->inicio->ant = nova->fim;
-  nova->fim = lista->fim;
+  lst->tamanho += nova->tamanho;
+  lst->fim->prox = nova->inicio;
+  nova->inicio->ant = lst->fim;
+  lst->fim = nova->fim;
 }
 void remover(lista *lst, celula *elemento)
 {
