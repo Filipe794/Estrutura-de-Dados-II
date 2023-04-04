@@ -429,6 +429,59 @@ lista *merge_sort(lista *lista1)
 
     return res;
 }
+void anexar_inicio(lista *nova, lista *lista)
+{
+    if ((lista == NULL) || (lista->tamanho == 0))
+    {
+        return;
+    }
+    nova->tamanho += lista->tamanho;
+    nova->cabeca->anterior = lista->fim;
+    lista->fim->proximo = nova->cabeca;
+    nova->cabeca = lista->cabeca;
+}
+void quick_sort(lista *lst)
+{
+    if ((lst == NULL) || (lst->tamanho <= 1))
+    {
+        return;
+    }
+    int metade = lst->tamanho / 2;
+    No *pivo = lst->cabeca;
+    for (int i = 0; i < metade; i++)
+    {
+        pivo = pivo->proximo;
+    }
+
+    lista menores;
+    lista maiores;
+
+    No *aux = lst->cabeca;
+    No *elemento = NULL;
+
+    while (aux != NULL)
+    {
+        elemento = aux;
+        aux = aux->proximo;
+        if (elemento == pivo)
+        {
+            continue;
+        }
+        remover(lst, elemento);
+        if (strcmp(pivo->nome, elemento->nome) > 0)
+        {
+            inserir_inicio(&menores, elemento);
+        }
+        else
+        {
+            inserir_inicio(&maiores, elemento);
+        }
+    }
+    quick_sort(&menores);
+    anexar_inicio(lst, &menores);
+    quick_sort(&maiores);
+    anexar_fim(lst, &maiores);
+}
 int main()
 {
     lista *lst = new lista;
