@@ -66,7 +66,7 @@ No *novo_no()
 }
 void anexar_inicio(lista *lst, lista *nova)
 {
-    if ((nova == NULL) || (nova->tamanho == 0)|| (lst == NULL))
+    if ((nova == NULL) || (nova->tamanho == 0) || (lst == NULL))
     {
         return;
     }
@@ -76,7 +76,7 @@ void anexar_inicio(lista *lst, lista *nova)
 }
 void anexar_fim(lista *lst, lista *nova)
 {
-    if ((nova == NULL)||(nova->tamanho == 0))
+    if ((lst == NULL) || (nova == NULL) || (nova->tamanho == 0))
     {
         return;
     }
@@ -107,7 +107,7 @@ void inserir_fim(lista *lst, No *Novo)
 }
 void inserir_inicio(lista *lst, No *Novo)
 {
-    if ((lst == NULL)||(Novo == NULL))
+    if ((lst == NULL) || (Novo == NULL))
         return;
     if (lst->tamanho == 0)
     {
@@ -154,7 +154,8 @@ void remover(lista *lst, No *elemento)
 
     No *antElem = prev(lst, elemento);
     No *proxElem = elemento->proximo;
-    antElem->proximo = proxElem;
+    if (antElem != NULL)
+        antElem->proximo = proxElem;
 
     elemento->proximo = NULL;
 }
