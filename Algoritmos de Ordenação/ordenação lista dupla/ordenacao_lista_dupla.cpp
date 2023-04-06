@@ -192,7 +192,6 @@ void troca_insertion(lista *lst, No *aux, No *troca)
 {
     No *prox_troca = troca->proximo;
     No *ant_troca = troca->anterior;
-    No *prox_aux = aux->proximo;
     No *ant_aux = aux->anterior;
 
     if (troca == lst->fim)
@@ -249,26 +248,6 @@ void insertion_sort(lista *lst)
             proximo = troca->proximo;
     }
 }
-void troca_proximo(lista *lst, No *aux)
-{
-    No *temp = aux->proximo;
-    aux->proximo = temp->proximo;
-    temp->proximo = aux;
-
-    if (aux == lst->cabeca)
-    {
-        lst->cabeca = temp;
-    }
-    else
-    {
-        No *anterior = lst->cabeca;
-        while (anterior->proximo != aux)
-        {
-            anterior = anterior->proximo;
-        }
-        anterior->proximo = temp;
-    }
-}
 void bubble_sort(lista *lst)
 {
     int cont_troca;
@@ -300,7 +279,8 @@ void selection_sort(lista *lst)
     if ((lst->cabeca == NULL) || (lst->cabeca->proximo == NULL))
         return;
 
-    No *menor, *inserir = lst->cabeca;
+    No *menor = lst->cabeca;
+    No *inserir = lst->cabeca;
     No *aux = menor->proximo;
 
     while (inserir->proximo != NULL)
