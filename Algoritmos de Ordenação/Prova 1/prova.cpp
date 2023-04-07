@@ -6,7 +6,7 @@
 typedef struct No
 {
     char nome[50];
-    char cpf[20];
+    char cpf[12];
     char data[20];
     struct No *proximo;
 } No;
