@@ -180,13 +180,15 @@ void encerra_vendas(lista *lst)
 {
     No *comp = lst->cabeca;
     No *aux = comp->proximo;
-    No *data_anterior = comp;
+    No *data_anterior = NULL;
     int cont = 0;
     while (comp != NULL)
     {
         while (aux != NULL)
         {
-            if (strcmp(comp->data, aux->data) == 0 && strcmp(aux->data, data_anterior->data) != 0)
+            if ((data_anterior != NULL) && strcmp(aux->data, data_anterior->data) != 0)
+                continue;
+            if (strcmp(comp->data, aux->data) == 0)
             {
                 cont++;
             }
@@ -194,8 +196,8 @@ void encerra_vendas(lista *lst)
             printf("Para a data %s temos %d ingressos vendidos", data_anterior, cont);
         }
         comp = comp->proximo;
+        data_anterior = comp;
     }
-    // atualizar o comp e o data_anterior
 }
 void remover(lista *lst, No *elemento)
 {
