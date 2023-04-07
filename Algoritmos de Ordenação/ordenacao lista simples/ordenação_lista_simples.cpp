@@ -31,11 +31,11 @@ No *prev(lista *lst, No *referencia)
 }
 void imprimir(lista *lst)
 {
-    No *inicio = lst->cabeca;
-    while (inicio != NULL)
+    No *aux = lst->cabeca;
+    while (aux != NULL)
     {
-        printf("%s ->  ", inicio->nome);
-        inicio = inicio->proximo;
+        printf("%s ->  ", aux->nome);
+        aux = aux->proximo;
     }
     printf("NULL");
     printf("\n\n");
