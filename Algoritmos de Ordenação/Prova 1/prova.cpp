@@ -47,9 +47,12 @@ void ler_info(No *Novo)
     printf("\nDigite o nome: ");
     scanf("%[^\n]s", Novo->nome);
     printf("\nDigite o CPF: ");
+    fflush(stdin);
     scanf("%[^\n]s", Novo->cpf);
     printf("\nDigite a data do evento (DD/MM/AAAA): ");
+    fflush(stdin);
     scanf("%[^\n]s", Novo->data);
+    printf("\n");
 }
 No *novo_no()
 {
@@ -74,7 +77,7 @@ void inserir_inicio(lista *lst, No *Novo)
     {
         if ((strcmp(aux->cpf, Novo->cpf) == 0) && (strcmp(aux->data, Novo->data) == 0))
         {
-            printf("Esse cpf ja possui um ingresso pra essa mesma data");
+            printf("Esse cpf ja possui um ingresso pra essa mesma data\n");
             return;
         }
         aux = aux->proximo;
@@ -88,6 +91,7 @@ void buscar_ingresso_cpf(lista *lst)
     char cpf[20];
     printf("Insira o CPF a ser procurado: ");
     scanf("%s", cpf);
+    printf("\n");
     No *aux = lst->cabeca;
     int cont = 0;
     while (aux != NULL)
@@ -101,14 +105,16 @@ void buscar_ingresso_cpf(lista *lst)
     }
     if (cont != 1)
     {
-        printf("Nenhum ingresso encontrado para esse CPF");
+        printf("Nenhum ingresso encontrado para esse CPF\n");
     }
+    printf("\n");
 }
 void buscar_ingresso_data(lista *lst)
 {
     char data[20];
-    printf("Insira o CPF a ser procurado: ");
+    printf("Insira a data a ser procurada: ");
     scanf("%s", data);
+    printf("\n");
     No *aux = lst->cabeca;
     int cont = 0;
     while (aux != NULL)
@@ -122,8 +128,9 @@ void buscar_ingresso_data(lista *lst)
     }
     if (cont != 1)
     {
-        printf("Nenhum ingresso encontrado para essa data");
+        printf("Nenhum ingresso encontrado para essa data\n");
     }
+    printf("\n");
 }
 void troca_insertion(lista *lst, No *aux, No *troca, No *proximo, No *anterior)
 {
@@ -162,7 +169,7 @@ void insertion_sort(lista *lst)
     {
         while (aux != troca)
         {
-            if (strcmp(aux->nome, troca->nome) > 0)
+            if (strcmp(aux->cpf, troca->cpf) > 0)
             {
                 troca_insertion(lst, aux, troca, proximo, anterior);
                 break;
@@ -176,29 +183,82 @@ void insertion_sort(lista *lst)
             proximo = troca->proximo;
     }
 }
+
+typedef struct data
+{
+    char data[20];
+    int cont = 1;
+    struct data *proximo;
+} data;
+
+typedef struct lista_data
+{
+    data *inicio = NULL;
+    data *fim = NULL;
+} lista_data;
+
+void nova_data(lista_data *lst, No *elemento)
+{
+    data *novo = new data;
+    lst->inicio = novo;
+    lst->fim = novo;
+    novo->proximo = NULL;
+    strcpy(novo->data, elemento->data);
+}
+
+void procura_data(lista_data *lst, No *elemento)
+{
+    if (elemento == NULL)
+        return;
+
+    data *teste_data = lst->inicio;
+    if (lst->inicio == NULL)
+    {
+        nova_data(lst,elemento);
+        return;
+    }
+
+    while (teste_data != NULL)
+    {
+        if (strcmp(elemento->data, teste_data->data) == 0)
+        {
+            teste_data->cont += 1;
+            return;
+        }
+        teste_data = teste_data->proximo;
+    }
+    data *novo = new data;
+    lst->fim->proximo = novo;
+    novo->proximo = NULL;
+    lst->fim = novo;
+    strcpy(novo->data, elemento->data);
+}
+
+void imprime_lista_data(lista_data *lst)
+{
+    data *aux = lst->inicio;
+    while (aux != NULL)
+    {
+        printf("Para a data %s temos %d ingressos vendidos\n", aux->data, aux->cont);
+        aux = aux->proximo;
+    }
+    printf("\n\n");
+}
+
 void encerra_vendas(lista *lst)
 {
+    lista_data* lista = new lista_data;
     No *comp = lst->cabeca;
-    No *aux = comp->proximo;
-    No *data_anterior = NULL;
-    int cont = 0;
+
     while (comp != NULL)
     {
-        while (aux != NULL)
-        {
-            if ((data_anterior != NULL) && strcmp(aux->data, data_anterior->data) != 0)
-                continue;
-            if (strcmp(comp->data, aux->data) == 0)
-            {
-                cont++;
-            }
-            aux = aux->proximo;
-            printf("Para a data %s temos %d ingressos vendidos", data_anterior, cont);
-        }
+        procura_data(lista,comp);
         comp = comp->proximo;
-        data_anterior = comp;
     }
+    imprime_lista_data(lista);
+    printf("\n");
 }
+
 void remover(lista *lst, No *elemento)
 {
     if ((lst == NULL) || (elemento == NULL) || (lst->tamanho == 0))
@@ -303,13 +363,31 @@ void menu()
 {
     printf("1 - Adicionar novo ingresso\n");
     printf("2 - Procurar ingressos por CPF\n");
-    printf("3 - Imprimir ingressos para uma determinada data");
+    printf("3 - Procurar ingressos para uma determinada data\n");
     printf("4 - Encerrar vendas\n");
     printf("0 - Sair\n");
+}
+void teste(lista *lst, char nome[50], char cpf[12], char data[20])
+{
+    No *inserir = new No;
+    strcpy(inserir->nome, nome);
+    strcpy(inserir->cpf, cpf);
+    strcpy(inserir->data, data);
+    inserir_inicio(lst, inserir);
 }
 int main()
 {
     lista *lst = new lista;
+
+    teste(lst, "filipe", "123321", "12/12/13");
+    teste(lst, "julia", "13524635", "12/12/12");
+    teste(lst, "bet", "123321", "12/12/12");
+    teste(lst, "will", "135246", "12/12/15");
+    teste(lst, "caua", "123321", "12/12/14");
+    teste(lst, "werton", "8765", "12/12/17");
+    teste(lst, "luis", "123321", "12/12/19");
+    teste(lst, "fernando", "87563", "12/12/21");
+
     int opcao;
     do
     {
@@ -330,6 +408,8 @@ int main()
             buscar_ingresso_data(lst);
             break;
         case 4:
+            quick_sort(lst);
+            imprimir_lista(lst);
             encerra_vendas(lst);
             break;
         case 0:
