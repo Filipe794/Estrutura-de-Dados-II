@@ -7,7 +7,8 @@ typedef struct No
 {
     char nome[50];
     char cpf[12];
-    char data[20];
+    char data[15];
+    char data_ordenacao[15];
     struct No *proximo;
 } No;
 typedef struct lista
@@ -41,17 +42,47 @@ void imprimir_lista(lista *lst)
     }
     printf("\n\n");
 }
+void concatena_data(No *Novo, char dia[], char mes[], char ano[])
+{
+    strcat(Novo->data, dia);
+    strcat(Novo->data, "/");
+    strcat(Novo->data, mes);
+    strcat(Novo->data, "/");
+    strcat(Novo->data, ano);
+}
+void concatena_data_ordenacao(No *Novo, char ano[], char mes[], char dia[])
+{
+    // preciso da data no formato AAAA/MM/DD pra ordenação funcionar corretamente
+    strcat(Novo->data_ordenacao, ano);
+    strcat(Novo->data_ordenacao, "/");
+    strcat(Novo->data_ordenacao, mes);
+    strcat(Novo->data_ordenacao, "/");
+    strcat(Novo->data_ordenacao, dia);
+}
 void ler_info(No *Novo)
 {
+    char dia[5];
+    char mes[5];
+    char ano[5];
     fflush(stdin);
     printf("\nDigite o nome: ");
     scanf("%[^\n]s", Novo->nome);
     printf("\nDigite o CPF: ");
     fflush(stdin);
     scanf("%[^\n]s", Novo->cpf);
-    printf("\nDigite a data do evento (DD/MM/AAAA): ");
+    printf("\nData do evento (DD/MM/AAAA): ");
     fflush(stdin);
-    scanf("%[^\n]s", Novo->data);
+    printf("\nDigite o dia do evento: ");
+    scanf("%s", dia);
+    printf("\nDigite o mes do evento: ");
+    fflush(stdin);
+    scanf("%s", mes);
+    printf("\nDigite o ano do evento: ");
+    fflush(stdin);
+    scanf("%s", ano);
+    fflush(stdin);
+    concatena_data(Novo, dia, mes, ano);
+    concatena_data_ordenacao(Novo, ano, mes, dia);
     printf("\n");
 }
 No *novo_no()
@@ -111,15 +142,29 @@ void buscar_ingresso_cpf(lista *lst)
 }
 void buscar_ingresso_data(lista *lst)
 {
-    char data[20];
-    printf("Insira a data a ser procurada: ");
-    scanf("%s", data);
+    char dia[5];
+    char mes[5];
+    char ano[5];
+    No *comp = new No;
+    printf("\nData do evento a ser procurado (DD/MM/AAAA): ");
+    fflush(stdin);
+    printf("\nDigite o dia do evento: ");
+    scanf("%s", dia);
+    printf("\nDigite o mes do evento: ");
+    fflush(stdin);
+    scanf("%s", mes);
+    printf("\nDigite o ano do evento: ");
+    fflush(stdin);
+    scanf("%s", ano);
+    fflush(stdin);
+    concatena_data(comp, dia, mes, ano);
     printf("\n");
+
     No *aux = lst->cabeca;
     int cont = 0;
     while (aux != NULL)
     {
-        if (strcmp(aux->data, data) == 0)
+        if (strcmp(aux->data, comp->data) == 0)
         {
             printf("Nome: %s CPF: %s Data do Evento: %s\n", aux->nome, aux->cpf, aux->data);
             cont = 1;
@@ -214,7 +259,7 @@ void procura_data(lista_data *lst, No *elemento)
     data *teste_data = lst->inicio;
     if (lst->inicio == NULL)
     {
-        nova_data(lst,elemento);
+        nova_data(lst, elemento);
         return;
     }
 
@@ -247,12 +292,12 @@ void imprime_lista_data(lista_data *lst)
 
 void encerra_vendas(lista *lst)
 {
-    lista_data* lista = new lista_data;
+    lista_data *lista = new lista_data;
     No *comp = lst->cabeca;
 
     while (comp != NULL)
     {
-        procura_data(lista,comp);
+        procura_data(lista, comp);
         comp = comp->proximo;
     }
     imprime_lista_data(lista);
@@ -345,7 +390,8 @@ void quick_sort(lista *lst)
             continue;
         }
         remover(lst, elemento);
-        if (strcmp(pivo->data, elemento->data) > 0)
+
+        if (strcmp(pivo->data_ordenacao, elemento->data_ordenacao) > 0)
         {
             inserir_inicio(&menores, elemento);
         }
@@ -367,26 +413,9 @@ void menu()
     printf("4 - Encerrar vendas\n");
     printf("0 - Sair\n");
 }
-void teste(lista *lst, char nome[50], char cpf[12], char data[20])
-{
-    No *inserir = new No;
-    strcpy(inserir->nome, nome);
-    strcpy(inserir->cpf, cpf);
-    strcpy(inserir->data, data);
-    inserir_inicio(lst, inserir);
-}
 int main()
 {
     lista *lst = new lista;
-
-    teste(lst, "filipe", "123321", "12/12/13");
-    teste(lst, "julia", "13524635", "12/12/12");
-    teste(lst, "bet", "123321", "12/12/12");
-    teste(lst, "will", "135246", "12/12/15");
-    teste(lst, "caua", "123321", "12/12/14");
-    teste(lst, "werton", "8765", "12/12/17");
-    teste(lst, "luis", "123321", "12/12/19");
-    teste(lst, "fernando", "87563", "12/12/21");
 
     int opcao;
     do
@@ -411,6 +440,9 @@ int main()
             quick_sort(lst);
             imprimir_lista(lst);
             encerra_vendas(lst);
+            break;
+        case 5:
+            imprimir_lista(lst);
             break;
         case 0:
             break;
