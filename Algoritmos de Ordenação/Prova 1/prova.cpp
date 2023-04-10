@@ -1,11 +1,11 @@
 #include <stdio.h>
-#include "prova.h"
+#include "funcoes.h"
 
 int main()
 {
     lista *lst = new lista;
     int opcao;
-    
+
     do
     {
         menu();
