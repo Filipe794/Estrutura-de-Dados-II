@@ -235,7 +235,6 @@ typedef struct data
     int cont = 1;
     struct data *proximo;
 } data;
-
 typedef struct lista_data
 {
     data *inicio = NULL;
@@ -250,7 +249,6 @@ void nova_data(lista_data *lst, No *elemento)
     novo->proximo = NULL;
     strcpy(novo->data, elemento->data);
 }
-
 void procura_data(lista_data *lst, No *elemento)
 {
     if (elemento == NULL)
@@ -278,7 +276,6 @@ void procura_data(lista_data *lst, No *elemento)
     lst->fim = novo;
     strcpy(novo->data, elemento->data);
 }
-
 void imprime_lista_data(lista_data *lst)
 {
     data *aux = lst->inicio;
@@ -289,7 +286,6 @@ void imprime_lista_data(lista_data *lst)
     }
     printf("\n\n");
 }
-
 void encerra_vendas(lista *lst)
 {
     lista_data *lista = new lista_data;
@@ -303,7 +299,6 @@ void encerra_vendas(lista *lst)
     imprime_lista_data(lista);
     printf("\n");
 }
-
 void remover(lista *lst, No *elemento)
 {
     if ((lst == NULL) || (elemento == NULL) || (lst->tamanho == 0))
@@ -410,7 +405,8 @@ void menu()
     printf("1 - Adicionar novo ingresso\n");
     printf("2 - Procurar ingressos por CPF\n");
     printf("3 - Procurar ingressos para uma determinada data\n");
-    printf("4 - Encerrar vendas\n");
+    printf("4 - Imprimir vendas\n");
+    printf("5- Encerrar vendas\n");
     printf("0 - Sair\n");
 }
 int main()
@@ -429,20 +425,39 @@ int main()
             inserir_inicio(lst, novo_no());
             break;
         case 2:
+            if (lst->cabeca == NULL)
+            {
+                printf("Nao ha ingressos vendidos\n");
+                break;
+            }
             insertion_sort(lst);
             buscar_ingresso_cpf(lst);
             break;
         case 3:
+            if (lst->cabeca == NULL)
+            {
+                printf("Nao ha ingressos vendidos\n");
+                break;
+            }
             insertion_sort(lst);
             buscar_ingresso_data(lst);
             break;
         case 4:
-            quick_sort(lst);
+            if (lst->cabeca == NULL)
+            {
+                printf("Nao ha ingressos vendidos\n");
+                break;
+            }
             imprimir_lista(lst);
-            encerra_vendas(lst);
             break;
         case 5:
-            imprimir_lista(lst);
+            if (lst->cabeca == NULL)
+            {
+                printf("Nao ha ingressos vendidos\n");
+                break;
+            }
+            quick_sort(lst);
+            encerra_vendas(lst);
             break;
         case 0:
             break;
