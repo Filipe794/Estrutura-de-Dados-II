@@ -305,15 +305,22 @@ No *menor(No *node)
   return menor(node->esquerda);
 }
 
-int altura(No *raiz){
-  if(raiz == NULL){
+int altura(No *raiz)
+{
+  if (raiz == NULL)
+  {
     return -1;
-  }else{
+  }
+  else
+  {
     int esquerda = altura(raiz->esquerda);
     int direita = altura(raiz->direita);
-    if (esquerda > direita){
+    if (esquerda > direita)
+    {
       return esquerda++;
-    }else{
+    }
+    else
+    {
       return direita++;
     }
   }
@@ -323,7 +330,8 @@ int soma = 0;
 
 int soma_elementos(No *node)
 {
-  if(node == NULL) return;
+  if (node == NULL)
+    return;
   soma_elementos(node->esquerda);
   soma += node->num;
   soma_elementos(node->direita);
@@ -333,28 +341,104 @@ int qnt_elementos = 0;
 
 int num_elementos(No *node)
 {
-  if(node == NULL) return;
+  if (node == NULL)
+    return;
   qnt_elementos++;
   num_elementos(node->direita);
   num_elementos(node->esquerda);
 }
 
 // fzr busca e retornar nós pra trocas
+No *busca(No *raiz, int num)
+{
+  if (raiz == NULL)
+    return NULL;
 
-// funcao de troca(No *node, No *node_2){}
+  if (raiz->num == num)
+    return raiz;
+
+  if (raiz->num < num)
+  {
+    busca(raiz->esquerda, num);
+  }
+  else
+  {
+    busca(raiz->direita, num);
+  }
+}
+
+int direita_ou_esquerda(No *pai, No* filho)
+{
+  if(pai == NULL || filho == NULL) return -1;
+
+  if (pai->esquerda == filho)
+  {
+    return 0;
+  }else{
+    return 1;
+  }
+}
+void troca(No **raiz, No *node_1, No *node_2)
+{
+
+  if (node_1->num == node_2->num)
+    return;
+
+  No *pai_node_1 = buscar_pai((*raiz), node_1->num);
+  No *pai_node_2 = buscar_pai((*raiz), node_2->num);
+
+  if (node_1 == (*raiz))
+  {
+    if(direita_ou_esquerda(pai_node_2,node_2)){
+
+    }
+    if (node_2 == node_1->esquerda || node_2 == node_1->direita)
+    {
+      // se for troca com pai e filho
+    }
+    (*raiz) = node_2;
+  }
+  else if (node_2 == (*raiz))
+  {
+    if (node_1 == node_2->esquerda || node_1 == node_2->direita)
+    {
+      // se for troca com pai e filho
+    }
+  }
+  if (node_2 == node_1->esquerda || node_2 == node_1->direita)
+  {
+    // se for troca com pai e filho
+  }
+  if (node_1 == node_2->esquerda || node_1 == node_2->direita)
+  {
+    // se for troca com pai e filho
+  }
+  if(direita_ou_esquerda() == 1){
+    // filho na direita
+  }else if(direita_ou_esquerda() == 0){
+    // filho na esquerda
+  }
+}
 // verificar se os numeros sao iguais, nao fzr nada
 // verificar se a troca é pai com filho
 // troca na raiz
-
-// funcao altura usa busca e passa o retorno dela pra funcao altura
 
 int main()
 {
   No *raiz = new No;
   printf("Maior: %d", maior(raiz)->num);
   printf("Menor: %d", menor(raiz)->num);
-  float media = soma/qnt_elementos;
+  float media = soma / qnt_elementos;
   printf("Media: %f", media);
-  // imprimir altura
+  int num;
+  printf("Insira o numero do no: ");
+  scanf("%d", num);
+  printf("A altura do no é %d", altura(busca(raiz, num)));
+  int num, num_2;
+  printf("Insira o numero do no 1: ");
+  scanf("%d", num);
+  printf("Insira o numero do no 2: ");
+  scanf("%d", num_2);
+  troca(&raiz, busca(raiz, num), busca(raiz, num_2));
   return 0;
 }
