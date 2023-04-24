@@ -564,22 +564,53 @@ void troca(No **raiz, No *node_1, No *node_2)
   node_2->direita = direita_node_1;
 }
 
+void menu()
+{
+  printf("1- Preencher Aleatoriamente\n");
+  printf("2- Maior, Menor e Média\n");
+  printf("3- Altura de um Nó\n");
+  printf("4- Troca entre Nós\n");
+  printf("5- Sair\n");
+}
 int main()
 {
   No *raiz = new No;
-  printf("Maior: %d", maior(raiz)->num);
-  printf("Menor: %d", menor(raiz)->num);
-  float media = soma / qnt_elementos;
-  printf("Media: %f", media);
-  int num;
-  printf("Insira o numero do no: ");
-  scanf("%d", num);
-  printf("A altura do no é %d", altura(busca(raiz, num)));
-  int num, num_2;
-  printf("Insira o numero do no 1 para a troca: ");
-  scanf("%d", num);
-  printf("Insira o numero do no 2 para a troca: ");
-  scanf("%d", num_2);
-  troca(&raiz, busca(raiz, num), busca(raiz, num_2));
+  int opcao;
+  do
+  {
+    menu();
+    scanf("%d", &opcao);
+    switch (opcao)
+    {
+    case 1:
+      inserir_teste(&raiz);
+      imprimir_arvore(raiz);
+      break;
+    case 2:
+      printf("Maior: %d", maior(raiz)->num);
+      printf("Menor: %d", menor(raiz)->num);
+      float media = soma / qnt_elementos;
+      printf("Media: %f", media);
+      break;
+    case 3:
+      int num;
+      printf("Insira o numero do no: ");
+      scanf("%d", num);
+      printf("A altura do no é %d", altura(busca(raiz, num)));
+      break;
+    case 4:
+      int num, num_2;
+      printf("Insira o numero do no 1 para a troca: ");
+      scanf("%d", num);
+      printf("Insira o numero do no 2 para a troca: ");
+      scanf("%d", num_2);
+      troca(&raiz, busca(raiz, num), busca(raiz, num_2));
+      break;
+    case 0:
+      break;
+    default:
+      printf("Opcao invalida!\n");
+    }
+  } while (opcao != 0);
   return 0;
 }
