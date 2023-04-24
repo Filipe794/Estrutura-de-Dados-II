@@ -270,7 +270,7 @@ No *remover_raiz(No **raiz)
   }
 }
 
-void imprimir(No *node) // função para imprimir a arvore
+void imprimir_arvore(No *node) // função para imprimir a arvore
 {
   if (node == NULL)
   {
@@ -278,8 +278,8 @@ void imprimir(No *node) // função para imprimir a arvore
   }
   imprimir_folha(node);
   printf("\n");
-  imprimir(node->direita);
-  imprimir(node->esquerda);
+  imprimir_arvore(node->direita);
+  imprimir_arvore(node->esquerda);
 }
 
 void imprimir_folha(No *node)
