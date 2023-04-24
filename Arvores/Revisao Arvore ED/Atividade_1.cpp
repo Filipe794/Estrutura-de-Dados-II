@@ -10,7 +10,7 @@ typedef struct node
   struct node *direita;
 } No;
 
-int num()
+int gera_num()
 {
   int num = rand() % 100; // gerando um localizador aleatorio
   while (num == 0)        // evitando q o localizador seja 0
@@ -25,7 +25,7 @@ No *criar_no(No *raiz)
 
   No *node = (No *)malloc(sizeof(No));
 
-  node->num = num();
+  node->num = gera_num();
 
   node->esquerda = NULL;
   node->direita = NULL;
@@ -68,7 +68,7 @@ void inserir_no(No *node, No *novo)
 No *preencher_no()
 {
   No *node = (No *)malloc(sizeof(No));
-  node->num = num();
+  node->num = gera_num();
 
   node->esquerda = NULL;
   node->direita = NULL;
@@ -367,14 +367,14 @@ No *busca(No *raiz, int num)
   }
 }
 
-int direita_ou_esquerda(No *pai, No* filho)
+int posicao_filho(No *pai, No* filho)
 {
   if(pai == NULL || filho == NULL) return -1;
 
   if (pai->esquerda == filho)
   {
     return 0;
-  }else{
+  }else if(pai->direita == filho){
     return 1;
   }
 }
@@ -389,22 +389,40 @@ void troca(No **raiz, No *node_1, No *node_2)
 
   if (node_1 == (*raiz))
   {
-    if(direita_ou_esquerda(pai_node_2,node_2)){
+    if(posicao_filho(pai_node_2,node_2) == 0){ // filho esta na esquerda
+      // reorganizar filho do no 1
+      pai_node_2->esquerda = node_1;
+    }else if(posicao_filho(pai_node_2,node_2) == 1){// filho esta na direita
 
     }
-    if (node_2 == node_1->esquerda || node_2 == node_1->direita)
+    if (node_2 == node_1->esquerda)
     {
-      // se for troca com pai e filho
+      // se for troca com pai e filho na esquerda do pai
+    }else if(node_2 == node_1->direita){
+      // se for troca com pai e filho na direita do pai
     }
     (*raiz) = node_2;
+    return;
   }
-  else if (node_2 == (*raiz))
+
+  if (node_2 == (*raiz))
   {
-    if (node_1 == node_2->esquerda || node_1 == node_2->direita)
-    {
-      // se for troca com pai e filho
+    if(posicao_filho(pai_node_1,node_1) == 0){ // filho esta na esquerda
+      // reorganizar filho do no 1
+      pai_node_1->esquerda = node_2;
+    }else if(posicao_filho(pai_node_1,node_1) == 1){// filho esta na direita
+
     }
+    if (node_1 == node_2->esquerda)
+    {
+      // se for troca com pai e filho na esquerda do pai
+    }else if(node_1 == node_2->direita){
+      // se for troca com pai e filho na direita do pai
+    }
+    (*raiz) = node_1;
+    return;
   }
+
   if (node_2 == node_1->esquerda || node_2 == node_1->direita)
   {
     // se for troca com pai e filho
@@ -413,11 +431,11 @@ void troca(No **raiz, No *node_1, No *node_2)
   {
     // se for troca com pai e filho
   }
-  if(direita_ou_esquerda() == 1){
-    // filho na direita
-  }else if(direita_ou_esquerda() == 0){
-    // filho na esquerda
-  }
+  // if(posicao_filho() == 1){
+  //   // filho na direita
+  // }else if(posicao_filho() == 0){
+  //   // filho na esquerda
+  // }
 }
 // verificar se os numeros sao iguais, nao fzr nada
 // verificar se a troca é pai com filho
@@ -435,9 +453,9 @@ int main()
   scanf("%d", num);
   printf("A altura do no é %d", altura(busca(raiz, num)));
   int num, num_2;
-  printf("Insira o numero do no 1: ");
+  printf("Insira o numero do no 1 para a troca: ");
   scanf("%d", num);
-  printf("Insira o numero do no 2: ");
+  printf("Insira o numero do no 2 para a troca: ");
   scanf("%d", num_2);
   troca(&raiz, busca(raiz, num), busca(raiz, num_2));
   return 0;
