@@ -367,79 +367,202 @@ No *busca(No *raiz, int num)
   }
 }
 
-int posicao_filho(No *pai, No* filho)
+int posicao_filho(No *pai, No *filho)
 {
-  if(pai == NULL || filho == NULL) return -1;
+  if (pai == NULL || filho == NULL)
+    return -1;
 
   if (pai->esquerda == filho)
   {
     return 0;
-  }else if(pai->direita == filho){
+  }
+  else if (pai->direita == filho)
+  {
     return 1;
   }
 }
+
+bool eh_filho(No *pai, No *node)
+{
+  if (pai == NULL || node == NULL)
+    return false;
+  if (pai->esquerda == node || pai->direita == node)
+  {
+    return true;
+  }
+  return false;
+}
+
 void troca(No **raiz, No *node_1, No *node_2)
 {
-
-  if (node_1->num == node_2->num)
+  if (((*raiz) == NULL) || (node_1 == NULL) || (node_2 == NULL) || (node_1->num == node_2->num))
     return;
 
   No *pai_node_1 = buscar_pai((*raiz), node_1->num);
   No *pai_node_2 = buscar_pai((*raiz), node_2->num);
 
+  No *direita_node_1 = node_1->direita;
+  No *esquerda_node_1 = node_1->esquerda;
+  No *direita_node_2 = node_2->direita;
+  No *esquerda_node_2 = node_2->esquerda;
+
+  if (node_1 == (*raiz) && eh_filho(node_1, node_2))
+  {
+    if (posicao_filho(pai_node_2, node_2) == 0)
+    { // filho esta na esquerda
+      node_2->direita = node_1;
+      node_2->esquerda = esquerda_node_1;
+    }
+    else if (posicao_filho(pai_node_2, node_2) == 1)
+    { // filho esta na direita
+      node_2->esquerda = node_1;
+      node_2->direita = direita_node_1;
+    }
+
+    node_1->direita = direita_node_2;
+    node_1->esquerda = esquerda_node_2;
+
+    (*raiz) = node_2;
+    return;
+  }
+  if (node_2 == (*raiz) && eh_filho(node_2, node_1))
+  {
+    if (posicao_filho(pai_node_1, node_1) == 0)
+    { // filho esta na esquerda
+      node_1->direita = node_2;
+      node_1->esquerda = esquerda_node_2;
+    }
+    else if (posicao_filho(pai_node_1, node_1) == 1)
+    { // filho esta na direita
+      node_1->esquerda = node_2;
+      node_1->direita = direita_node_2;
+    }
+
+    node_2->direita = direita_node_1;
+    node_2->esquerda = esquerda_node_1;
+
+    (*raiz) = node_1;
+    return;
+  }
+  // terminei os casos na troca na raiz, e o outro nó sendo o filho
+  // agora troca nas raiz quando o nó nao for filho
+
   if (node_1 == (*raiz))
   {
-    if(posicao_filho(pai_node_2,node_2) == 0){ // filho esta na esquerda
-      // reorganizar filho do no 1
-      pai_node_2->esquerda = node_1;
-    }else if(posicao_filho(pai_node_2,node_2) == 1){// filho esta na direita
+    node_2->esquerda = esquerda_node_1;
+    node_2->direita = direita_node_1;
+    node_1->esquerda = esquerda_node_2;
+    node_1->direita = direita_node_2;
 
+    if (posicao_filho(pai_node_2, node_2) == 0)
+    { // esta na esquerda
+      pai_node_2->esquerda = node_1;
     }
-    if (node_2 == node_1->esquerda)
+    else if (posicao_filho(pai_node_2, node_2) == 1)
     {
-      // se for troca com pai e filho na esquerda do pai
-    }else if(node_2 == node_1->direita){
-      // se for troca com pai e filho na direita do pai
+      pai_node_2->direita = node_1;
     }
     (*raiz) = node_2;
     return;
   }
-
   if (node_2 == (*raiz))
   {
-    if(posicao_filho(pai_node_1,node_1) == 0){ // filho esta na esquerda
-      // reorganizar filho do no 1
-      pai_node_1->esquerda = node_2;
-    }else if(posicao_filho(pai_node_1,node_1) == 1){// filho esta na direita
+    node_2->esquerda = esquerda_node_1;
+    node_2->direita = direita_node_1;
+    node_1->esquerda = esquerda_node_2;
+    node_1->direita = direita_node_2;
 
+    if (posicao_filho(pai_node_1, node_1) == 0)
+    { // esta na esquerda
+      pai_node_1->esquerda = node_2;
     }
-    if (node_1 == node_2->esquerda)
+    else if (posicao_filho(pai_node_1, node_1) == 1)
     {
-      // se for troca com pai e filho na esquerda do pai
-    }else if(node_1 == node_2->direita){
-      // se for troca com pai e filho na direita do pai
+      pai_node_1->direita = node_2;
     }
     (*raiz) = node_1;
     return;
   }
 
-  if (node_2 == node_1->esquerda || node_2 == node_1->direita)
+  // troca com pai e filho sem ser na raiz
+  if (eh_filho(node_1, node_2))
   {
-    // se for troca com pai e filho
+    if (posicao_filho(node_1, node_2) == 0)
+    { // esquerda
+      node_2->esquerda = node_1;
+      node_2->direita = direita_node_1;
+    }
+    else if (posicao_filho(node_1, node_2) == 1)
+    { // direita
+      node_2->direita = node_1;
+      node_2->esquerda = esquerda_node_1;
+    }
+
+    node_1->esquerda = esquerda_node_2;
+    node_1->direita = direita_node_2;
+
+    // atualizando pai_node_1
+    if (posicao_filho(pai_node_1, node_1) == 0)
+    {
+      pai_node_1->esquerda = node_2;
+    }
+    else if (posicao_filho(pai_node_1, node_1) == 1)
+    {
+      pai_node_1->direita = node_2;
+    }
+    return;
   }
-  if (node_1 == node_2->esquerda || node_1 == node_2->direita)
+  if (eh_filho(node_2, node_1))
   {
-    // se for troca com pai e filho
+    if (posicao_filho(node_2, node_1) == 0)
+    { // esquerda
+      node_1->esquerda = node_2;
+      node_1->direita = direita_node_2;
+    }
+    else if (posicao_filho(node_2, node_1) == 1)
+    { // direita
+      node_1->direita = node_2;
+      node_1->esquerda = esquerda_node_2;
+    }
+
+    node_2->esquerda = esquerda_node_1;
+    node_2->direita = direita_node_1;
+
+    // atualizando o pai_node_2
+    if (posicao_filho(pai_node_2, node_2) == 0)
+    { // esquerda
+      pai_node_2->esquerda = node_1;
+    }
+    else if (posicao_filho(pai_node_2, node_2) == 1)
+    { // direita
+      pai_node_2->direita = node_1;
+    }
+    return;
   }
-  // if(posicao_filho() == 1){
-  //   // filho na direita
-  // }else if(posicao_filho() == 0){
-  //   // filho na esquerda
-  // }
+
+  // troca entre dois nós quaisquer
+  if (posicao_filho(pai_node_2, node_2) == 0)
+  { // esquerda
+    pai_node_2->esquerda = node_1;
+  }
+  else if (posicao_filho(pai_node_2, node_2) == 1)
+  { // direita
+    pai_node_2->esquerda = node_1;
+  }
+
+  if (posicao_filho(pai_node_1, node_1) == 0)
+  { // esquerda
+    pai_node_1->esquerda = node_2;
+  }
+  else if (posicao_filho(pai_node_1, node_1) == 1)
+  { // direita
+    pai_node_1->esquerda = node_2;
+  }
+  node_1->esquerda = esquerda_node_2;
+  node_1->direita = direita_node_2;
+  node_2->esquerda = esquerda_node_1;
+  node_2->direita = direita_node_1;
 }
-// verificar se os numeros sao iguais, nao fzr nada
-// verificar se a troca é pai com filho
-// troca na raiz
 
 int main()
 {
