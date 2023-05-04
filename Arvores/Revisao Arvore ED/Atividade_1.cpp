@@ -570,7 +570,8 @@ void menu()
   printf("2- Maior, Menor e Média\n");
   printf("3- Altura de um Nó\n");
   printf("4- Troca entre Nós\n");
-  printf("5- Sair\n");
+  printf("5- Imprimir\n");
+  printf("0- Sair\n");
 }
 int main()
 {
@@ -605,6 +606,9 @@ int main()
       printf("Insira o numero do no 2 para a troca: ");
       scanf("%d", num_2);
       troca(&raiz, busca(raiz, num), busca(raiz, num_2));
+      break;
+    case 5:
+      imprimir_arvore(raiz);
       break;
     case 0:
       break;
