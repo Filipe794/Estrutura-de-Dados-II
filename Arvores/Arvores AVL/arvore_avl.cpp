@@ -12,13 +12,17 @@ typedef struct node {
 
 No *remover(No *node, int num);
 
-No *criar_no() {
+No *criar_no(int num = -1) {
   No *node = (No *)malloc(sizeof(No));
 
-  // printf("Digite o numero: ");
-  // scanf("%d", &node->num);
-  node->num = rand() % 100;
-  printf("%d, ", node->num);
+  if (num == -1) {
+    // printf("Digite o numero: ");
+    // scanf("%d", &node->num);
+    node->num = rand() % 100;
+    printf("%d, ", node->num);
+  } else {
+    node->num = num;
+  }
 
   node->esq = NULL;
   node->dir = NULL;
@@ -281,7 +285,12 @@ void altura_no(No *raiz) {
   }
 }
 
-void fb_no(No *raiz) {
+int fb_no(No *no) {
+  if (no == NULL) return 0;
+  return altura(no->esq) - altura(no->dir);
+}
+
+void fb_raiz(No *raiz) {
   int num = 0;
   printf("Digite o numero: ");
   scanf("%d", &num);
@@ -325,53 +334,160 @@ void arvore_aleatoria(No **root) {
   }
 }
 
+void rot_simples_esq(No **raiz, No *no, bool dupla = false) {
+  No *filho = no->dir;
+  if (filho == NULL) {
+    printf("Rotação errada\n");
+    return;
+  }
+
+  No *esq_filho = filho->esq;
+  no->dir = esq_filho;
+  filho->esq = no;
+
+  No *pai = buscar_pai(*raiz, no->num);
+  if (pai == NULL) {
+    *raiz = filho;
+  } else {
+    if (dupla == true) {
+      pai->esq = filho;
+    } else {
+      pai->dir = filho;
+    }
+  }
+}
+
+void rot_simples_dir(No **raiz, No *no, bool dupla = false) {
+  No *filho = no->esq;
+  if (filho == NULL) {
+    printf("Rotação errada\n");
+    return;
+  }
+
+  No *dir_filho = filho->dir;
+  no->esq = dir_filho;
+  filho->dir = no;
+
+  No *pai = buscar_pai(*raiz, no->num);
+  if (pai == NULL) {
+    *raiz = filho;
+  } else {
+    if (dupla == true) {
+      pai->dir = filho;
+    } else {
+      pai->esq = filho;
+    }
+  }
+}
+
+void rot_dupla_dir(No **raiz, No *no) {
+  No *filho = no->esq;
+  if (filho == NULL) {
+    printf("Rotação errada\n");
+    return;
+  }
+  rot_simples_esq(raiz, filho, true);
+  rot_simples_dir(raiz, no);
+}
+
+void rot_dupla_esq(No **raiz, No *no) {
+  No *filho = no->dir;
+  if (filho == NULL) {
+    printf("Rotação errada\n");
+    return;
+  }
+  rot_simples_dir(raiz, filho, true);
+  rot_simples_esq(raiz, no);
+}
+
+void balancear(No **raiz, No *no) {
+  if (no == NULL) return;
+
+  if (fb_no(no) <= -2) {       // Rotacão esquerda
+    if (fb_no(no->dir) < 1) {  // Rotação simples
+      rot_simples_esq(raiz, no);
+    } else {  // Rotação dupla
+      rot_dupla_esq(raiz, no);
+    }
+  }
+
+  if (fb_no(no) >= 2) {  // Rotacão direita
+
+    if (fb_no(no->esq) > -1) {  // Rotação simples
+      rot_simples_dir(raiz, no);
+    } else {  // Rotação dupla
+      rot_dupla_dir(raiz, no);
+    }
+  }
+}
+
 int main(int argc, char const *argv[]) {
   srand(time(NULL));
 
-  No *root = NULL;
-  int opc = 1;
-  while (opc != 0) {
-    menu();
-    scanf("%d", &opc);
-    switch (opc) {
-      case 1:
-        inserir_raiz(&root);
-        break;
-      case 2:
-        buscar_raiz(root);
-        break;
-      case 3:
-        imprimir(root);
-        break;
-      case 4:
-        remover_raiz(&root);
-        break;
-      case 5:
-        arvore_aleatoria(&root);
-        break;
-      case 6:
-        printf("Maior:%d, Menor:%d, Média:%.2f\n", maior(root)->num,
-               menor(root)->num, media(root));
-        break;
-      case 7:
-        printf("Altura: %d\n", altura(root));
-        break;
-      case 8:
-        altura_no(root);
-        break;
-      case 9:
-        fb_no(root);
-        break;
-      case 10:
-        imprimir_fb(root);
-        break;
-      case 0:
-        break;
-      default:
-        printf("Opção inválida\n");
-        break;
-    }
-  }
+  No *no = criar_no(5);
+  No *root = no;
+
+  no = criar_no(6);
+  inserir_no(root, no);
+  No *no4 = criar_no(4);
+  inserir_no(root, no4);
+  no = criar_no(2);
+  inserir_no(root, no);
+  no = criar_no(1);
+  inserir_no(root, no);
+  // no = criar_no(3);
+  // inserir_no(root, no);
+
+  imprimir(root);
+  printf("================\n");
+  balancear(&root, root);
+  imprimir(root);
+
+  // int opc = 1;
+  // while (opc != 0) {
+  //   menu();
+  //   scanf("%d", &opc);
+  //   switch (opc) {
+  //     case 1:
+  //       inserir_raiz(&root);
+  //       break;
+  //     case 2:
+  //       buscar_raiz(root);
+  //       break;
+  //     case 3:
+  //       imprimir(root);
+  //       balancear(&root, no4);
+  //       imprimir(root);
+  //       break;
+  //     case 4:
+  //       remover_raiz(&root);
+  //       break;
+  //     case 5:
+  //       arvore_aleatoria(&root);
+  //       break;
+  //     case 6:
+  //       printf("Maior:%d, Menor:%d, Média:%.2f\n", maior(root)->num,
+  //              menor(root)->num, media(root));
+  //       break;
+  //     case 7:
+  //       printf("Altura: %d\n", altura(root));
+  //       break;
+  //     case 8:
+  //       altura_no(root);
+  //       break;
+  //     case 9:
+  //       fb_raiz(root);
+  //       break;
+  //     case 10:
+  //       imprimir_fb(root);
+  //       break;
+  //     case 0:
+  //       break;
+  //     default:
+  //       printf("Opção inválida\n");
+  //       break;
+  //   }
+  // }
 
   return 0;
 }
