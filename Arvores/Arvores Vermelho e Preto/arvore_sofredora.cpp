@@ -1,238 +1,337 @@
-// ponteiro pro pai?
-// impletar rotações
-// campos para as cores serem booleanos ou inteiros (1 ou 0)
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
+// 1 = preto
+// 0 = vermelho
+
+enum Cor
+{
+  vermelho = 0,
+  preto = 1
+};
+
 typedef struct node
 {
-    int num;
-    struct node *esq;
-    struct node *dir;
-    bool red;
+  int num;
+  struct node *esq = NULL;
+  struct node *dir = NULL;
+  struct node *pai = NULL;
+  Cor cor = vermelho;
 } No;
 
-No *criar_no(int num = -1)
+No *criar_no()
 {
-    No *node = (No *)malloc(sizeof(No));
-
-    if (num == -1)
-    {
-        node->num = rand() % 100;
-        printf("%d, ", node->num);
-    }
-    else
-    {
-        node->num = num;
-    }
-
-    node->esq = NULL;
-    node->dir = NULL;
-    node->red = true;
-
-    return node;
+  No *node = new No;
+  printf("Insira o valor do no: ");
+  scanf("%d", &node->num);
+  return node;
 }
 
-void inserir_no(No *node, No *novo)
+int posicao_filho(No *pai, No *filho)
 {
-    if (node == NULL)
-    {
-        printf("Erro\n");
-        return;
-    }
+  if (pai == NULL || filho == NULL)
+    return -1;
 
-    if (node->num == novo->num)
-    {
-        printf("Número já existe\n");
-        return;
-    }
+  if (pai->esq == filho)
+  {
+    return 0;
+  }
+  else if (pai->dir == filho)
+  {
+    return 1;
+  }
+}
 
+void inserir_no(No **root, No *node, No *novo)
+{
+  if (node == NULL)
+  {
+    printf("Erro\n");
+    return;
+  }
+
+  if (node->num == novo->num)
+  {
+    printf("Número já existe\n");
+    return;
+  }
+
+  if (node->cor == preto)
+  {
     if (node->num < novo->num)
     {
-        if (node->dir == NULL)
-        {
-            node->dir = novo;
-            if (node->red == true)
-            {
-                novo->red = false;
-            }
-            return;
-        }
-        inserir_no(node->dir, novo);
+      if (node->dir == NULL)
+      {
+        node->dir = novo;
+        novo->pai = node;
+        return;
+      }
+      inserir_no(root,node->dir, novo);
     }
-    else
+    else if (node->esq == NULL)
     {
-        if (node->esq == NULL)
-        {
-            node->esq = novo;
-            if (node->red == true)
-            {
-                novo->red = false;
-            }
-            return;
-        }
-        inserir_no(node->esq, novo);
+      node->esq = novo;
+      novo->pai = node;
+      return;
     }
+    inserir_no(root,node->esq, novo);
+  }
+
+  // procurar tio
+  No *tio = NULL;
+  No *avo = node->pai->pai;
+  No *pai = node->pai;
+
+  int filho_posicao = posicao_filho(node->pai, node);
+
+  if (filho_posicao == 0)
+  {
+    tio = node->pai->dir;
+  }
+  else if (filho_posicao == 1)
+  {
+    tio = node->pai->esq;
+  }
+  
+  //comparar cores tio e pai
+  if(pai->cor == vermelho && tio->cor == vermelho){
+    //recolorir pai tio e avo
+    if(avo != (*root)){
+      avo->cor = vermelho;
+    }
+    pai->cor = preto;
+    tio->cor = vermelho;
+    
+    // inserir nó
+
+  }
+
+
+
+
+  if (node->num < novo->num)
+  {
+    if (node->dir == NULL)
+    {
+      node->dir = novo;
+      if (node->cor == vermelho)
+      {
+        novo->cor = preto;
+      }
+      novo->pai = node;
+      return;
+    }
+    inserir_no(root,node->dir, novo);
+  }
+  else
+  {
+    if (node->esq == NULL)
+    {
+      node->esq = novo;
+      if (node->cor == vermelho)
+      {
+        novo->cor = preto;
+      }
+      novo->pai = node;
+      return;
+    }
+    inserir_no(root,node->esq, novo);
+  }
 }
 
 void inserir_raiz(No **raiz)
 {
-    if (*raiz == NULL)
-    {
-        *raiz = criar_no();
-        (*raiz)->red = false;
-        return;
-    }
-
-    inserir_no(*raiz, criar_no());
+  if (*raiz == NULL)
+  {
+    *raiz = criar_no();
+    (*raiz)->cor = preto;
+    (*raiz)->pai = NULL;
+    return;
+  }
+  inserir_no(raiz, *raiz, criar_no());
 }
 
-No *buscar_pai(No *node, No *filho) {
-  if (node == NULL) return NULL;
-
-  if ((node->esq != NULL) && (node->esq == filho)) {
-    return node;
-  }
-
-  if ((node->dir != NULL) && (node->dir == filho)) {
-    return node;
-  }
-
-  if (node->num < filho->num) {
-    return buscar_pai(node->dir, filho);
-  } else {
-    return buscar_pai(node->esq, filho);
-  }
-}
-
-bool um_filho(No *node) {
+bool um_filho(No *node)
+{
   // return (node->esq == NULL) && (node->dir == NULL);
-  if ((node->esq == NULL) && (node->dir != NULL)) {
+  if ((node->esq == NULL) && (node->dir != NULL))
+  {
     return true;
   }
 
-  if ((node->esq != NULL) && (node->dir == NULL)) {
+  if ((node->esq != NULL) && (node->dir == NULL))
+  {
     return true;
   }
 
   return false;
 }
 
-bool eh_folha(No *node) {
+bool eh_folha(No *node)
+{
   // return (node->esq == NULL) && (node->dir == NULL);
-  if ((node->esq == NULL) && (node->dir == NULL)) {
+  if ((node->esq == NULL) && (node->dir == NULL))
+  {
     return true;
-  } else {
+  }
+  else
+  {
     return false;
   }
 }
 
-No *maior(No *node) {
-  if (node == NULL) return NULL;
-  if (node->dir == NULL) return node;
+No *maior(No *node)
+{
+  if (node == NULL)
+    return NULL;
+  if (node->dir == NULL)
+    return node;
   return maior(node->dir);
 }
 
-No *menor(No *node) {
-  if (node == NULL) return NULL;
-  if (node->esq == NULL) return node;
+No *menor(No *node)
+{
+  if (node == NULL)
+    return NULL;
+  if (node->esq == NULL)
+    return node;
   return menor(node->esq);
 }
 
-int altura(No *node) {
-  if (node == NULL || node->red == true) return 0;
-
-  return 1 + fmax(altura(node->esq), altura(node->dir)); // precisa do 1+?
-}
-
-void arvore_aleatoria(No **root) {
-  for (int i = 0; i < 10; i++) {
-    inserir_raiz(root);
+int altura(No *node)
+{
+  if (node == NULL)
+    return 0;
+  if (node->cor == vermelho)
+  {
+    return fmax(altura(node->esq), altura(node->dir));
   }
+  return 1 + fmax(altura(node->esq), altura(node->dir));
 }
 
-void imprimir(No *node, int tab = 0) {
-  if (node == NULL) return;
+int balanceada(No *root)
+{
+  int altura_esquerda = altura(root->esq);
+  int altura_direita = altura(root->dir);
+
+  if (altura_direita > altura_esquerda)
+  {
+    return 1;
+  }
+  else if (altura_direita < altura_esquerda)
+  {
+    return -1;
+  }
+  return 0;
+}
+
+void imprimir(No *node, int tab = 0)
+{
+  if (node == NULL)
+    return;
 
   imprimir(node->dir, tab + 1);
-  for (int i = 0; i < tab; i++) {
+  for (int i = 0; i < tab; i++)
+  {
     printf("\t");
   }
-  printf("%d\n", node->num);
+  printf("%d - %d\n", node->num, node->cor);
   imprimir(node->esq, tab + 1);
 }
 
-int main(int argc, char const *argv[]) {
+No *buscar_no(No *node, int num)
+{
+  if (node == NULL)
+  {
+    printf("Número não encontrado\n");
+    return NULL;
+  }
+
+  if (node->num == num)
+  {
+    return node;
+  }
+
+  if (node->num < num)
+  {
+    return buscar_no(node->dir, num);
+  }
+  else
+  {
+    return buscar_no(node->esq, num);
+  }
+}
+
+void menu()
+{
+  printf("MENU\n");
+  printf("1-Inserir\n");
+  printf("2-Imprimir Árvore\n");
+  printf("3-Remover\n");
+  printf("4-Altura arvore\n");
+  printf("5-Altura nó\n");
+  printf("0-Sair\n");
+}
+
+int main()
+{
   srand(time(NULL));
 
-  No *no = criar_no(5);
-  No *root = no;
-
-  no = criar_no(6);
-  inserir_no(root, no);
-  No *no4 = criar_no(4);
-  inserir_no(root, no4);
-  no = criar_no(2);
-  inserir_no(root, no);
-  no = criar_no(1);
-  inserir_no(root, no);
-  // no = criar_no(3);
-  // inserir_no(root, no);
-
-  imprimir(root);
-  printf("================\n");
-//   balancear(&root, root);
-  imprimir(root);
-
-  // int opc = 1;
-  // while (opc != 0) {
-  //   menu();
-  //   scanf("%d", &opc);
-  //   switch (opc) {
-  //     case 1:
-  //       inserir_raiz(&root);
-  //       break;
-  //     case 2:
-  //       buscar_raiz(root);
-  //       break;
-  //     case 3:
-  //       imprimir(root);
-  //       balancear(&root, no4);
-  //       imprimir(root);
-  //       break;
-  //     case 4:
-  //       remover_raiz(&root);
-  //       break;
-  //     case 5:
-  //       arvore_aleatoria(&root);
-  //       break;
-  //     case 6:
-  //       printf("Maior:%d, Menor:%d, Média:%.2f\n", maior(root)->num,
-  //              menor(root)->num, media(root));
-  //       break;
-  //     case 7:
-  //       printf("Altura: %d\n", altura(root));
-  //       break;
-  //     case 8:
-  //       altura_no(root);
-  //       break;
-  //     case 9:
-  //       fb_raiz(root);
-  //       break;
-  //     case 10:
-  //       imprimir_fb(root);
-  //       break;
-  //     case 0:
-  //       break;
-  //     default:
-  //       printf("Opção inválida\n");
-  //       break;
-  //   }
-  // }
-
+  No *root = NULL;
+  No *node = new No;
+  int num;
+  int opc = 1;
+  while (opc != 0)
+  {
+    menu();
+    scanf("%d", &opc);
+    switch (opc)
+    {
+    case 1:
+      inserir_raiz(&root);
+      break;
+    case 2:
+      imprimir(root);
+      break;
+    case 3:
+      // remover();
+      break;
+    case 4:
+      altura(root);
+      break;
+    case 5:
+      printf("Insira o valor do no a ser procurado: ");
+      scanf("%d", &num);
+      node = buscar_no(root, num);
+      altura(node);
+      break;
+    case 6:
+      num = balanceada(root);
+      if (num != 0)
+      {
+        if (num == 1)
+        { // desbalanceada pra direita
+          printf("desbalanceada\n");
+        }
+        if (num == -1)
+        { // desbalanceada pra esquerda
+          printf("desbalanceada\n");
+        }
+      }
+      else
+      {
+        printf("Arvore esta balanceada\n");
+      }
+      break;
+    case 0:
+      break;
+    default:
+      printf("Opção inválida\n");
+      break;
+    }
+  }
   return 0;
 }
