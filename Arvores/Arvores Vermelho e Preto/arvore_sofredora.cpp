@@ -45,101 +45,215 @@ int posicao_filho(No *pai, No *filho)
   }
 }
 
-void inserir_no(No **root, No *node, No *novo)
+int cor(No *node)
 {
   if (node == NULL)
+    return preto;
+  if (node->cor == vermelho)
+    return vermelho;
+  if (node->cor == preto)
+    return preto;
+}
+
+void rot_simples_esq(No **raiz, No *no, bool dupla = false)
+{
+  No *filho = no->dir;
+  if (filho == NULL)
+  {
+    printf("Rotação errada\n");
+    return;
+  }
+
+  No *esq_filho = filho->esq;
+  no->dir = esq_filho;
+  filho->esq = no;
+
+  No *pai = no->pai;
+  if (pai == NULL)
+  {
+    *raiz = filho;
+  }
+  else
+  {
+    if (dupla == true)
+    {
+      pai->esq = filho;
+    }
+    else
+    {
+      pai->dir = filho;
+    }
+  }
+}
+
+void rot_simples_dir(No **raiz, No *no, bool dupla = false)
+{
+  No *filho = no->esq;
+  if (filho == NULL)
+  {
+    printf("Rotação errada\n");
+    return;
+  }
+
+  No *dir_filho = filho->dir;
+  no->esq = dir_filho;
+  filho->dir = no;
+
+  No *pai = no->pai;
+  if (pai == NULL)
+  {
+    *raiz = filho;
+  }
+  else
+  {
+    if (dupla == true)
+    {
+      pai->dir = filho;
+    }
+    else
+    {
+      pai->esq = filho;
+    }
+  }
+}
+
+void rot_dupla_dir(No **raiz, No *no)
+{
+  No *filho = no->esq;
+  if (filho == NULL)
+  {
+    printf("Rotação errada\n");
+    return;
+  }
+  rot_simples_esq(raiz, filho, true);
+  rot_simples_dir(raiz, no);
+}
+
+void rot_dupla_esq(No **raiz, No *no)
+{
+  No *filho = no->dir;
+  if (filho == NULL)
+  {
+    printf("Rotação errada\n");
+    return;
+  }
+  rot_simples_dir(raiz, filho, true);
+  rot_simples_esq(raiz, no);
+}
+
+void inserir_no(No **root, No *pai, No *novo)
+{
+  if (pai == NULL)
   {
     printf("Erro\n");
     return;
   }
 
-  if (node->num == novo->num)
+  if (pai->num == novo->num)
   {
     printf("Número já existe\n");
     return;
   }
 
-  if (node->cor == preto)
+  // inserir nó
+  if (pai->num < novo->num)
   {
-    if (node->num < novo->num)
+    if (pai->dir == NULL)
     {
-      if (node->dir == NULL)
-      {
-        node->dir = novo;
-        novo->pai = node;
-        return;
-      }
-      inserir_no(root,node->dir, novo);
+      pai->dir = novo;
+      novo->pai = pai;
     }
-    else if (node->esq == NULL)
+    else
     {
-      node->esq = novo;
-      novo->pai = node;
-      return;
+      inserir_no(root, pai->dir, novo);
     }
-    inserir_no(root,node->esq, novo);
-  }
-
-  // procurar tio
-  No *tio = NULL;
-  No *avo = node->pai->pai;
-  No *pai = node->pai;
-
-  int filho_posicao = posicao_filho(node->pai, node);
-
-  if (filho_posicao == 0)
-  {
-    tio = node->pai->dir;
-  }
-  else if (filho_posicao == 1)
-  {
-    tio = node->pai->esq;
-  }
-  
-  //comparar cores tio e pai
-  if(pai->cor == vermelho && tio->cor == vermelho){
-    //recolorir pai tio e avo
-    if(avo != (*root)){
-      avo->cor = vermelho;
-    }
-    pai->cor = preto;
-    tio->cor = vermelho;
-    
-    // inserir nó
-
-  }
-
-
-
-
-  if (node->num < novo->num)
-  {
-    if (node->dir == NULL)
-    {
-      node->dir = novo;
-      if (node->cor == vermelho)
-      {
-        novo->cor = preto;
-      }
-      novo->pai = node;
-      return;
-    }
-    inserir_no(root,node->dir, novo);
   }
   else
   {
-    if (node->esq == NULL)
+    if (pai->esq == NULL)
     {
-      node->esq = novo;
-      if (node->cor == vermelho)
+      pai->esq = novo;
+      novo->pai = pai;
+    }
+    else
+    {
+      inserir_no(root, pai->esq, novo);
+    }
+  }
+
+  No *tio = NULL;
+  No *avo = novo->pai->pai;
+  No *pai = novo->pai;
+
+  if (avo->esq == pai) // pai na esquerda
+  {
+    tio = avo->dir;
+  }
+  else if (avo->dir == pai) // pai na direita
+  {
+    tio = avo->esq;
+  }
+
+  int cor_pai = cor(pai);
+  int cor_tio = cor(tio);
+
+  if (cor_pai != preto) // CASO O PAI SEJA PRETO, NAO PRECISA ALTERAR NADA
+  {
+    if (cor_pai == vermelho && cor_tio == vermelho)
+    {
+      if ((*root) != avo)
+      {
+        avo->cor = vermelho;
+      }
+      cor_tio = preto;
+      cor_pai = preto;
+    }
+    if (cor_pai == vermelho && cor_tio == preto)
+    {
+      // rotação simples a direita
+      if (avo->esq == pai && pai->esq == novo)
+      {
+        pai->cor = preto;
+        avo->cor = vermelho;
+        tio->cor = vermelho;
+        // posso recolorir logo aq, antes de chamar a função de rotação
+        rot_simples_dir(root, avo);
+      }
+      else if (avo->dir == pai && pai->dir == novo)
+      {
+        // rotação simples a esquerda
+        pai->cor = preto;
+        avo->cor = vermelho;
+        tio->cor = vermelho;
+        // posso recolorir logo aq, antes de chamar a função de rotação?
+        rot_simples_esq(root, avo);
+      }
+      else if (avo->esq == pai && pai->dir == novo)
       {
         novo->cor = preto;
+        avo->cor = vermelho;
+        rot_dupla_dir(root, avo);
       }
-      novo->pai = node;
-      return;
+      else if (avo->dir == pai && pai->esq == novo)
+      {
+        novo->cor = preto;
+        avo->cor = vermelho;
+        rot_dupla_esq(root, avo);
+      }
     }
-    inserir_no(root,node->esq, novo);
   }
+
+  // comparar cores tio e pai
+  // if (pai->cor == vermelho && tio->cor == vermelho)
+  // {
+  //   // recolorir pai tio e avo
+  //   if (avo != (*root))
+  //   {
+  //     avo->cor = vermelho;
+  //   }
+  //   pai->cor = preto;
+  //   tio->cor = vermelho;
+  // }
 }
 
 void inserir_raiz(No **raiz)
