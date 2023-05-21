@@ -45,16 +45,6 @@ int posicao_filho(No *pai, No *filho)
   }
 }
 
-int cor(No *node)
-{
-  if (node == NULL)
-    return preto;
-  if (node->cor == vermelho)
-    return vermelho;
-  if (node->cor == preto)
-    return preto;
-}
-
 void rot_simples_esq(No **raiz, No *no, bool dupla = false)
 {
   No *filho = no->dir;
@@ -141,61 +131,97 @@ void rot_dupla_esq(No **raiz, No *no)
   rot_simples_esq(raiz, no);
 }
 
-void inserir_no(No **root, No *pai, No *novo)
+void inserir_raiz(No **root, No *novo)
 {
-  if (pai == NULL)
+  if ((*root) == NULL)
+  {
+    (*root) = novo;
+    novo->cor = preto;
+    return;
+  }
+
+  inserir_no(*root, novo);
+}
+
+void inserir_no(No *root, No *novo)
+{
+  if (root == NULL)
   {
     printf("Erro\n");
     return;
   }
 
-  if (pai->num == novo->num)
+  if (root->num == novo->num)
   {
     printf("Número já existe\n");
     return;
   }
 
   // inserir nó
-  if (pai->num < novo->num)
+  if (root->num < novo->num)
   {
-    if (pai->dir == NULL)
+    if (root->dir == NULL)
     {
-      pai->dir = novo;
-      novo->pai = pai;
+      root->dir = novo;
+      novo->pai = root;
+      return;
     }
-    else
-    {
-      inserir_no(root, pai->dir, novo);
-    }
+    inserir_no(root->dir, novo);
   }
   else
   {
-    if (pai->esq == NULL)
+    if (root->esq == NULL)
     {
-      pai->esq = novo;
-      novo->pai = pai;
+      root->esq = novo;
+      novo->pai = root;
+      return;
     }
-    else
-    {
-      inserir_no(root, pai->esq, novo);
-    }
+    inserir_no(root->esq, novo);
   }
+}
+
+void balanceada(No **root, No *node)
+{
+  if (node == NULL)
+    return;
+
+  balanceada(root, node->dir);
+
+  int altura_esquerda = altura(node->esq);
+  int altura_direita = altura(node->dir);
+
+  if (altura_direita > altura_esquerda)
+  {
+    printf("desbalanceada para a direita\n");
+    balancear(root, node->dir);
+  }
+  else if (altura_direita < altura_esquerda)
+  {
+    printf("desbalanceada para a esquerda\n");
+    balancear(root, node->esq);
+  }
+
+  balanceada(root, node->esq);
+}
+
+void balancear(No **root, No *novo)
+{
 
   No *tio = NULL;
   No *avo = novo->pai->pai;
   No *pai = novo->pai;
 
-  if (avo->esq == pai) // pai na esquerda
+  if (avo->esq == pai)
   {
     tio = avo->dir;
   }
-  else if (avo->dir == pai) // pai na direita
+  else if (avo->dir == pai)
   {
     tio = avo->esq;
   }
 
-  int cor_pai = cor(pai);
-  int cor_tio = cor(tio);
+  int cor_pai = pai->cor;
+  int cor_tio = tio->cor;
 
   if (cor_pai != preto) // CASO O PAI SEJA PRETO, NAO PRECISA ALTERAR NADA
   {
@@ -242,18 +268,6 @@ void inserir_no(No **root, No *pai, No *novo)
       }
     }
   }
-
-  // comparar cores tio e pai
-  // if (pai->cor == vermelho && tio->cor == vermelho)
-  // {
-  //   // recolorir pai tio e avo
-  //   if (avo != (*root))
-  //   {
-  //     avo->cor = vermelho;
-  //   }
-  //   pai->cor = preto;
-  //   tio->cor = vermelho;
-  // }
 }
 
 void inserir_raiz(No **raiz)
@@ -265,7 +279,7 @@ void inserir_raiz(No **raiz)
     (*raiz)->pai = NULL;
     return;
   }
-  inserir_no(raiz, *raiz, criar_no());
+  inserir_no(*raiz, criar_no());
 }
 
 bool um_filho(No *node)
@@ -324,22 +338,6 @@ int altura(No *node)
     return fmax(altura(node->esq), altura(node->dir));
   }
   return 1 + fmax(altura(node->esq), altura(node->dir));
-}
-
-int balanceada(No *root)
-{
-  int altura_esquerda = altura(root->esq);
-  int altura_direita = altura(root->dir);
-
-  if (altura_direita > altura_esquerda)
-  {
-    return 1;
-  }
-  else if (altura_direita < altura_esquerda)
-  {
-    return -1;
-  }
-  return 0;
 }
 
 void imprimir(No *node, int tab = 0)
@@ -423,22 +421,7 @@ int main()
       altura(node);
       break;
     case 6:
-      num = balanceada(root);
-      if (num != 0)
-      {
-        if (num == 1)
-        { // desbalanceada pra direita
-          printf("desbalanceada\n");
-        }
-        if (num == -1)
-        { // desbalanceada pra esquerda
-          printf("desbalanceada\n");
-        }
-      }
-      else
-      {
-        printf("Arvore esta balanceada\n");
-      }
+      balanceada(&root,root);
       break;
     case 0:
       break;
