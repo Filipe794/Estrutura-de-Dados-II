@@ -9,8 +9,8 @@
 
 enum Cor
 {
-  vermelho = 0,
-  preto = 1
+  vermelho,
+  preto
 };
 
 typedef struct node
@@ -28,6 +28,17 @@ No *criar_no()
   printf("Insira o valor do no: ");
   scanf("%d", &node->num);
   return node;
+}
+
+int altura(No *node)
+{
+  if (node == NULL)
+    return 0;
+  if (node->cor == vermelho)
+  {
+    return fmax(altura(node->esq), altura(node->dir));
+  }
+  return 1 + fmax(altura(node->esq), altura(node->dir));
 }
 
 int posicao_filho(No *pai, No *filho)
@@ -131,18 +142,6 @@ void rot_dupla_esq(No **raiz, No *no)
   rot_simples_esq(raiz, no);
 }
 
-void inserir_raiz(No **root, No *novo)
-{
-  if ((*root) == NULL)
-  {
-    (*root) = novo;
-    novo->cor = preto;
-    return;
-  }
-
-  inserir_no(*root, novo);
-}
-
 void inserir_no(No *root, No *novo)
 {
   if (root == NULL)
@@ -164,6 +163,9 @@ void inserir_no(No *root, No *novo)
     {
       root->dir = novo;
       novo->pai = root;
+      if(novo->pai->cor == vermelho && novo->cor  == vermelho){
+        novo->cor = preto;        
+      }
       return;
     }
     inserir_no(root->dir, novo);
@@ -174,9 +176,139 @@ void inserir_no(No *root, No *novo)
     {
       root->esq = novo;
       novo->pai = root;
+      if(novo->pai->cor == vermelho && novo->cor  == vermelho){
+        novo->cor = preto;        
+      }
       return;
     }
     inserir_no(root->esq, novo);
+  }
+}
+
+void inserir_raiz(No **raiz, No *node)
+{
+  if (*raiz == NULL)
+  {
+    *raiz = node;
+    (*raiz)->cor = preto;
+    (*raiz)->pai = NULL;
+    return;
+  }
+  inserir_no(*raiz, node);
+}
+
+void balancear(No **root, No *novo)
+{
+  printf("entrou\n\n");
+  if (novo == (*root) || novo == NULL)
+    return;
+
+  No *tio = new No;
+  No *pai = novo->pai;
+  No *avo = NULL;
+
+  printf("passou 1\n\n");
+  if (pai != NULL)
+  {
+    avo = pai->pai;
+  }
+  printf("passou 2\n\n");
+  if (avo)
+  {
+    if (avo->esq == pai)
+    {
+      if (avo->dir == NULL)
+      {
+        tio->cor = preto;
+      }
+      else
+      {
+        tio = avo->dir;
+      }
+    }
+    else if (avo->dir == pai)
+    {
+      if (avo->esq == NULL)
+      {
+        tio->cor = preto;
+      }
+      else
+      {
+        tio = avo->esq;
+      }
+    }
+  }
+  printf("passou 3\n\n");
+  if (pai->cor != preto) // CASO O PAI SEJA PRETO, NAO PRECISA ALTERAR NADA
+  {
+    printf("passou 4\n\n");
+    if (pai->cor == vermelho && tio->cor == vermelho)
+    {
+      printf("passou 5\n\n");
+      if ((*root) != avo)
+      {
+        printf("passou 6\n\n");
+        if (avo)
+        {
+          avo->cor = vermelho;
+        }
+      }
+      printf("passou 7\n\n");
+      tio->cor = preto;
+      pai->cor = preto;
+      printf("passou 8\n\n");
+      return;
+    }
+    if (pai->cor == vermelho && tio->cor == preto)
+    {
+      printf("passou 10\n\n");
+      if (avo)
+      { // rotação simples a direita
+        printf("passou 11\n\n");
+        if (avo->esq == pai && pai->esq == novo)
+        {
+          printf("passou 12\n\n");
+          pai->cor = preto;
+          avo->cor = vermelho;
+          tio->cor = vermelho;
+          printf("passou 13\n\n");
+          // posso recolorir logo aq, antes de chamar a função de rotação
+          rot_simples_dir(root, avo);
+          printf("passou 14\n\n");
+          return;
+        }
+        else if (avo->dir == pai && pai->dir == novo)
+        {
+          printf("passou 15\n\n");
+          // rotação simples a esquerda
+          pai->cor = preto;
+          avo->cor = vermelho;
+          tio->cor = vermelho;
+          printf("passou 16\n\n");
+          // posso recolorir logo aq, antes de chamar a função de rotação?
+          rot_simples_esq(root, avo);
+          printf("passou 17\n\n");
+          return;
+        }
+        else if (avo->esq == pai && pai->dir == novo)
+        {
+          printf("passou 18\n\n");
+          novo->cor = preto;
+          avo->cor = vermelho;
+          rot_dupla_dir(root, avo);
+          printf("passou 19\n\n");
+          return;
+        }
+        else if (avo->dir == pai && pai->esq == novo)
+        {
+          novo->cor = preto;
+          avo->cor = vermelho;
+          rot_dupla_esq(root, avo);
+          printf("passou 20\n\n");
+          return;
+        }
+      }
+    }
   }
 }
 
@@ -184,102 +316,15 @@ void balanceada(No **root, No *node)
 {
   if (node == NULL)
     return;
-
-  balanceada(root, node->dir);
-
+  printf("testou\n\n\n");
   int altura_esquerda = altura(node->esq);
   int altura_direita = altura(node->dir);
 
-  if (altura_direita > altura_esquerda)
+  if (altura_direita != altura_esquerda)
   {
-    printf("desbalanceada para a direita\n");
-    balancear(root, node->dir);
+    balancear(root, node);
   }
-  else if (altura_direita < altura_esquerda)
-  {
-    printf("desbalanceada para a esquerda\n");
-    balancear(root, node->esq);
-  }
-
-  balanceada(root, node->esq);
-}
-
-void balancear(No **root, No *novo)
-{
-
-  No *tio = NULL;
-  No *avo = novo->pai->pai;
-  No *pai = novo->pai;
-
-  if (avo->esq == pai)
-  {
-    tio = avo->dir;
-  }
-  else if (avo->dir == pai)
-  {
-    tio = avo->esq;
-  }
-
-  int cor_pai = pai->cor;
-  int cor_tio = tio->cor;
-
-  if (cor_pai != preto) // CASO O PAI SEJA PRETO, NAO PRECISA ALTERAR NADA
-  {
-    if (cor_pai == vermelho && cor_tio == vermelho)
-    {
-      if ((*root) != avo)
-      {
-        avo->cor = vermelho;
-      }
-      cor_tio = preto;
-      cor_pai = preto;
-    }
-    if (cor_pai == vermelho && cor_tio == preto)
-    {
-      // rotação simples a direita
-      if (avo->esq == pai && pai->esq == novo)
-      {
-        pai->cor = preto;
-        avo->cor = vermelho;
-        tio->cor = vermelho;
-        // posso recolorir logo aq, antes de chamar a função de rotação
-        rot_simples_dir(root, avo);
-      }
-      else if (avo->dir == pai && pai->dir == novo)
-      {
-        // rotação simples a esquerda
-        pai->cor = preto;
-        avo->cor = vermelho;
-        tio->cor = vermelho;
-        // posso recolorir logo aq, antes de chamar a função de rotação?
-        rot_simples_esq(root, avo);
-      }
-      else if (avo->esq == pai && pai->dir == novo)
-      {
-        novo->cor = preto;
-        avo->cor = vermelho;
-        rot_dupla_dir(root, avo);
-      }
-      else if (avo->dir == pai && pai->esq == novo)
-      {
-        novo->cor = preto;
-        avo->cor = vermelho;
-        rot_dupla_esq(root, avo);
-      }
-    }
-  }
-}
-
-void inserir_raiz(No **raiz)
-{
-  if (*raiz == NULL)
-  {
-    *raiz = criar_no();
-    (*raiz)->cor = preto;
-    (*raiz)->pai = NULL;
-    return;
-  }
-  inserir_no(*raiz, criar_no());
+  balanceada(root, node->pai);
 }
 
 bool um_filho(No *node)
@@ -327,17 +372,6 @@ No *menor(No *node)
   if (node->esq == NULL)
     return node;
   return menor(node->esq);
-}
-
-int altura(No *node)
-{
-  if (node == NULL)
-    return 0;
-  if (node->cor == vermelho)
-  {
-    return fmax(altura(node->esq), altura(node->dir));
-  }
-  return 1 + fmax(altura(node->esq), altura(node->dir));
 }
 
 void imprimir(No *node, int tab = 0)
@@ -403,7 +437,9 @@ int main()
     switch (opc)
     {
     case 1:
-      inserir_raiz(&root);
+      node = criar_no();
+      inserir_raiz(&root, node);
+      balanceada(&root, node);
       break;
     case 2:
       imprimir(root);
@@ -419,9 +455,6 @@ int main()
       scanf("%d", &num);
       node = buscar_no(root, num);
       altura(node);
-      break;
-    case 6:
-      balanceada(&root,root);
       break;
     case 0:
       break;
