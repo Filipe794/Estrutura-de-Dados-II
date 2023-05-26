@@ -80,6 +80,7 @@ void rot_simples_esq(No **raiz, No *no, bool dupla = false)
   if (pai == NULL)
   {
     *raiz = filho;
+   (*raiz)->cor = preto;
   }
   else
   {
@@ -271,7 +272,7 @@ void balancear(No **root, No *novo)
         rot_simples_dir(root, avo);
         return;
       }
-      else if (avo->dir == pai && pai->dir == novo)
+      if (avo->dir == pai && pai->dir == novo)
       {
         // rotação simples a esquerda
         pai->cor = preto;
@@ -279,14 +280,14 @@ void balancear(No **root, No *novo)
         rot_simples_esq(root, avo);
         return;
       }
-      else if (avo->esq == pai && pai->dir == novo)
+      if (avo->esq == pai && pai->dir == novo)
       {
         novo->cor = preto;
         avo->cor = vermelho;
         rot_dupla_dir(root, avo);
         return;
       }
-      else if (avo->dir == pai && pai->esq == novo)
+      if (avo->dir == pai && pai->esq == novo)
       {
         novo->cor = preto;
         avo->cor = vermelho;
@@ -403,6 +404,68 @@ void menu()
   printf("4-Altura arvore\n");
   printf("5-Altura nó\n");
   printf("0-Sair\n");
+}
+
+void substituir(No *pai, No *removido) {
+  if (um_filho(removido)) {
+    if (removido->esq != NULL) {
+      pai->esq = removido->esq;
+    } else {
+      pai->dir = removido->dir;
+    }
+  } else {
+    // testar se a esquerda é nula e ir pra direita
+    No *substituto = maior(removido->esq);
+    remover(pai, substituto->num);
+    substituto->esq = removido->esq;
+    substituto->dir = removido->dir;
+    if (pai->num < substituto->num) {
+      pai->dir = substituto;
+    } else {
+      pai->esq = substituto;
+    }
+    removido->dir = NULL;
+    removido->esq = NULL;
+  }
+}
+
+No *remover(No *node, int num) {
+  No *pai = node->pai;
+  if (pai == NULL) {
+    printf("Numero não encontrado");
+    return NULL;
+  } else {
+    No *removido = NULL;
+    if (pai->num < num) {
+      removido = pai->dir;
+      if (eh_folha(removido)) {
+        pai->dir = NULL;
+      } else {
+        substituir(pai, removido);
+      }
+    } else {
+      removido = pai->esq;
+      if (eh_folha(removido)) {
+        pai->esq = NULL;
+      } else {
+        substituir(pai, removido);
+      }
+    }
+    return removido;
+  }
+}
+
+void balancear_remover(){
+  // pegar maior da esquerda ou menor da direita (testar se é nulo)
+  //inserir casos de remoção
+  // remoção de nó vermelho nao faz nada
+  // nó preto
+  //    irmão preto, sem filhos
+  //        recolorir pai e irmão
+  //    irmão preto, com filho vermelho
+  //        rotação simples e recolorir o filho pra preto 
+  //    irmão vermelho
+  //        rotação simples (pivo é o pai)
 }
 
 int main()
