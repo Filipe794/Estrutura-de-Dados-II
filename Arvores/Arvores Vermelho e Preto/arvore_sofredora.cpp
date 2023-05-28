@@ -124,6 +124,7 @@ void rot_simples_esq(No **raiz, No *no, bool dupla = false)
   no->pai = filho;
 
   No *pai = filho->pai;
+
   if (pai == NULL)
   {
     *raiz = filho;
@@ -159,12 +160,8 @@ void rot_simples_dir(No **raiz, No *no, bool dupla = false)
   }
 
   No *dir_filho = filho->dir;
-  printf("1 ---------------------\n");
-  imprimir(filho);
 
   no->esq = dir_filho;
-  printf("2 ---------------------\n");
-  imprimir(filho);
 
   filho->dir = no;
 
@@ -172,12 +169,8 @@ void rot_simples_dir(No **raiz, No *no, bool dupla = false)
   {
     dir_filho->pai = no;
   }
-  printf("3 ---------------------\n");
-  imprimir(filho);
   filho->pai = no->pai;
   no->pai = filho;
-  printf("4 ---------------------\n");
-  imprimir(filho);
 
   No *pai = filho->pai;
 
@@ -190,7 +183,6 @@ void rot_simples_dir(No **raiz, No *no, bool dupla = false)
   {
     if (dupla == true)
     {
-      printf("atualiza dir\n");
       pai->dir = filho;
     }
     else
@@ -335,7 +327,6 @@ void balancear(No **root, No *novo)
 
   if (pai->cor == vermelho && (tio == NULL || tio->cor == preto))
   {
-
     if (avo != NULL)
     { // rotação simples a direita
       if (avo->esq == pai && pai->esq == novo)
@@ -373,7 +364,6 @@ void balancear(No **root, No *novo)
 
 void balanceada(No **root, No *node)
 {
-
   if ((*root) == NULL)
   {
     printf("Arvore vazia\n");
@@ -729,7 +719,6 @@ void remover_balanceado(No **root, No *remover)
   int cor_remover = substituto->cor;
 
   remover_no(root, substituto);
-  imprimir(*root);
 
   substituto->pai = pai_remover;
   substituto->cor = remover->cor;
@@ -817,7 +806,6 @@ void remover_balanceado(No **root, No *remover)
   {
     if (posicao_filho(pai_substituto, irmao_substituto) == 0)
     {
-      printf("a");
       if (irmao_substituto->pai->cor == preto)
       {
         irmao_substituto->dir->cor = vermelho;
@@ -826,13 +814,11 @@ void remover_balanceado(No **root, No *remover)
     }
     else if (posicao_filho(pai_substituto, irmao_substituto) == 1)
     {
-      printf("b");
       if (irmao_substituto->pai->cor == preto)
       {
         irmao_substituto->esq->cor = vermelho;
       }
       rot_simples_esq(root, irmao_substituto->pai);
-      imprimir(*root);
     }
     return;
   }
