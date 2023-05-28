@@ -70,6 +70,20 @@ bool eh_folha(No *node)
   }
 }
 
+void imprimir(No *node, int tab = 0)
+{
+  if (node == NULL)
+    return;
+
+  imprimir(node->dir, tab + 1);
+  for (int i = 0; i < tab; i++)
+  {
+    printf("\t");
+  }
+  printf("%d - %d\n", node->num, node->cor);
+  imprimir(node->esq, tab + 1);
+}
+
 int posicao_filho(No *pai, No *filho)
 {
 
@@ -99,6 +113,7 @@ void rot_simples_esq(No **raiz, No *no, bool dupla = false)
 
   No *esq_filho = filho->esq;
   no->dir = esq_filho;
+
   filho->esq = no;
 
   if (esq_filho != NULL)
@@ -122,7 +137,14 @@ void rot_simples_esq(No **raiz, No *no, bool dupla = false)
     }
     else
     {
-      pai->dir = filho;
+      if (pai->dir == no)
+      {
+        pai->dir = filho;
+      }
+      else
+      {
+        pai->esq = filho;
+      }
     }
   }
 }
@@ -137,17 +159,28 @@ void rot_simples_dir(No **raiz, No *no, bool dupla = false)
   }
 
   No *dir_filho = filho->dir;
+  printf("1 ---------------------\n");
+  imprimir(filho);
+
   no->esq = dir_filho;
+  printf("2 ---------------------\n");
+  imprimir(filho);
+
   filho->dir = no;
 
   if (dir_filho != NULL)
   {
     dir_filho->pai = no;
   }
+  printf("3 ---------------------\n");
+  imprimir(filho);
   filho->pai = no->pai;
   no->pai = filho;
+  printf("4 ---------------------\n");
+  imprimir(filho);
 
   No *pai = filho->pai;
+
   if (pai == NULL)
   {
     *raiz = filho;
@@ -157,11 +190,19 @@ void rot_simples_dir(No **raiz, No *no, bool dupla = false)
   {
     if (dupla == true)
     {
+      printf("atualiza dir\n");
       pai->dir = filho;
     }
     else
     {
-      pai->esq = filho;
+      if (pai->esq == no)
+      {
+        pai->esq = filho;
+      }
+      else
+      {
+        pai->dir = filho;
+      }
     }
   }
 }
@@ -333,7 +374,8 @@ void balancear(No **root, No *novo)
 void balanceada(No **root, No *node)
 {
 
-  if((*root) == NULL){
+  if ((*root) == NULL)
+  {
     printf("Arvore vazia\n");
     return;
   }
@@ -341,7 +383,8 @@ void balanceada(No **root, No *node)
   if (node == NULL)
     return;
 
-  if(eh_folha((*root))){
+  if (eh_folha((*root)))
+  {
     (*root)->cor = preto;
     return;
   }
@@ -383,20 +426,6 @@ No *menor(No *node)
   if (node->esq == NULL)
     return node;
   return menor(node->esq);
-}
-
-void imprimir(No *node, int tab = 0)
-{
-  if (node == NULL)
-    return;
-
-  imprimir(node->dir, tab + 1);
-  for (int i = 0; i < tab; i++)
-  {
-    printf("\t");
-  }
-  printf("%d - %d\n", node->num, node->cor);
-  imprimir(node->esq, tab + 1);
 }
 
 No *buscar_no(No *node, int num)
@@ -462,8 +491,9 @@ void trocar_cor(No *node)
   return;
 }
 
-void remover_balanceado(No **root, No *remover)
+void remover_no(No **root, No *remover)
 {
+
   if ((*root) == NULL)
   {
     printf("Arvore vazia\n");
@@ -479,7 +509,6 @@ void remover_balanceado(No **root, No *remover)
       (*root) = NULL;
       return;
     }
-
     if (pai_remover->esq == remover)
     {
       pai_remover->esq = NULL;
@@ -488,11 +517,9 @@ void remover_balanceado(No **root, No *remover)
     {
       pai_remover->dir = NULL;
     }
-
     remover->pai = NULL;
     return;
   }
-
   if (um_filho(remover))
   {
     if (remover == (*root))
@@ -513,16 +540,13 @@ void remover_balanceado(No **root, No *remover)
     if (pai_remover->esq == remover)
     {
       if (remover->esq != NULL)
-      {
-        // remover esta na esquerda do pai e o filho do remover esta na esquerda
+      { // remover esta na esquerda do pai e o filho do remover esta na esquerda
         pai_remover->esq = remover->esq;
-        pai_remover->esq->cor = remover->cor;
         remover->esq->pai = pai_remover;
       }
       else if (remover->dir != NULL)
       { // remover esta na esquerda do pai e o filho do remover esta na direita
         pai_remover->esq = remover->dir;
-        pai_remover->esq->cor = remover->cor;
         remover->dir->pai = pai_remover;
       }
       remover->esq = remover->dir = remover->pai = NULL;
@@ -546,78 +570,269 @@ void remover_balanceado(No **root, No *remover)
       return;
     }
   }
+}
+
+void remover_balanceado(No **root, No *remover)
+{
+  if ((*root) == NULL)
+  {
+    printf("Arvore vazia\n");
+    return;
+  }
+
+  No *pai_remover = remover->pai;
+
+  if (eh_folha(remover))
+  {
+    if ((*root) == remover)
+    {
+      (*root) = NULL;
+      return;
+    }
+    No *irmao_remover = irmao(pai_remover, remover);
+
+    if (pai_remover->esq == remover)
+    {
+      pai_remover->esq = NULL;
+    }
+    else
+    {
+      pai_remover->dir = NULL;
+    }
+    remover->pai = NULL;
+
+    if (irmao_remover != NULL)
+    { // testar se o pai tem outra subarvore
+
+      // casos de balanceamento
+      // remoção de nó vermelho nao faz nada
+      if (remover->cor == vermelho)
+        return;
+
+      // irmão preto, sem filhos
+      //   recolorir pai e irmão
+      if (irmao_remover == NULL || irmao_remover->cor == preto)
+      {
+        if (irmao_remover == NULL || eh_folha(irmao_remover))
+        {
+          if (pai_remover != (*root))
+          {
+            trocar_cor(pai_remover);
+          }
+          trocar_cor(irmao_remover);
+          return;
+        }
+        if (irmao_remover->esq->cor == vermelho)
+        {
+          irmao_remover->esq->cor = preto;
+          rot_simples_dir(root, pai_remover);
+          return;
+        }
+        else if (irmao_remover->dir->cor == vermelho)
+        {
+          irmao_remover->dir->cor = preto;
+          rot_simples_esq(root, pai_remover);
+          return;
+        }
+      }
+      if (irmao_remover->cor == vermelho)
+      {
+        if (posicao_filho(pai_remover, irmao_remover) == 0)
+        {
+          if (irmao_remover->pai->cor == preto)
+          {
+            irmao_remover->dir->cor = vermelho;
+          }
+          rot_simples_dir(root, pai_remover);
+        }
+        else if (posicao_filho(pai_remover, irmao_remover) == 1)
+        {
+          if (irmao_remover->pai->cor == preto)
+          {
+            irmao_remover->esq->cor = vermelho;
+          }
+          rot_simples_esq(root, pai_remover);
+        }
+        return;
+      }
+    }
+    return;
+  }
+
+  if (um_filho(remover))
+  {
+    if (remover == (*root))
+    {
+      if (remover->esq != NULL)
+      { // remover é a raiz e o filho esta na esquerda
+        (*root) = remover->esq;
+        remover->esq->pai = NULL;
+      }
+      else if (remover->dir != NULL)
+      { // remover é a raiz e o filho esta na direita
+        (*root) = remover->dir;
+        remover->dir->pai = NULL;
+      }
+      pai_remover->esq->cor = remover->cor;
+      remover->esq = remover->dir = remover->pai = NULL;
+      return;
+    }
+    if (pai_remover->esq == remover)
+    {
+      if (remover->esq != NULL)
+      {
+        // remover esta na esquerda do pai e o filho do remover esta na esquerda
+        pai_remover->esq = remover->esq;
+        remover->esq->pai = pai_remover;
+      }
+      else if (remover->dir != NULL)
+      { // remover esta na esquerda do pai e o filho do remover esta na direita
+        pai_remover->esq = remover->dir;
+        remover->dir->pai = pai_remover;
+      }
+      pai_remover->esq->cor = remover->cor;
+      remover->esq = remover->dir = remover->pai = NULL;
+      return;
+    }
+    else if (pai_remover->dir == remover)
+    {
+      if (remover->esq != NULL)
+      { // remover esta na direita do pai e o filho do remover esta na esquerda
+        pai_remover->dir = remover->esq;
+        remover->esq->pai = pai_remover;
+      }
+      else if (remover->dir != NULL)
+      { // remover esta na direita do pai e o filho do remover esta na direita
+        pai_remover->dir = remover->dir;
+        remover->dir->pai = pai_remover;
+      }
+      pai_remover->dir->cor = remover->cor;
+      remover->esq = remover->dir = remover->pai = NULL;
+      return;
+    }
+  }
 
   // a partir daq é o caso em que o remover tem dois filhos
 
   No *substituto = NULL;
-  No *irmao_remover = irmao(pai_remover, remover);
 
   if (remover->esq != NULL)
   {
     substituto = maior(remover->esq);
-    remover_balanceado(root, substituto);
   }
   else if (remover->dir != NULL)
   {
     substituto = menor(remover->dir);
-    remover_balanceado(root, substituto);
   }
 
-  if (posicao_filho(pai_remover, remover) == 0)
-  { // remover esta na esquerda do pai
-    pai_remover->esq = substituto;
-  }
-  else if (posicao_filho(pai_remover, remover) == 1)
-  { // remover esta na direita do pai
-    pai_remover->dir = substituto;
-  }
+  No *irmao_substituto = irmao(substituto->pai, substituto);
+  int cor_remover = substituto->cor;
+
+  remover_no(root, substituto);
+  imprimir(*root);
 
   substituto->pai = pai_remover;
+  substituto->cor = remover->cor;
+
   substituto->esq = remover->esq;
+
+  if (remover->esq != NULL)
+  {
+    remover->esq->pai = substituto;
+  }
+
   substituto->dir = remover->dir;
+
+  if (remover->dir != NULL)
+  {
+    remover->dir->pai = substituto;
+  }
+
   remover->esq = remover->dir = remover->pai = NULL;
+
+  if (remover == (*root))
+  {
+    (*root) = substituto;
+  }
+  else
+  {
+    if (posicao_filho(pai_remover, remover) == 0)
+    { // remover esta na esquerda do pai
+      pai_remover->esq = substituto;
+    }
+    else if (posicao_filho(pai_remover, remover) == 1)
+    { // remover esta na direita do pai
+      pai_remover->dir = substituto;
+    }
+  }
 
   // casos de balanceamento
 
   // remoção de nó vermelho nao faz nada
-  if (remover->cor == vermelho)
+  if (cor_remover == vermelho)
     return;
 
+  No *pai_substituto = irmao_substituto->pai;
   // irmão preto, sem filhos
   //   recolorir pai e irmão
-  if (irmao_remover == NULL || irmao_remover->cor == preto)
+  if (irmao_substituto == NULL || irmao_substituto->cor == preto)
   {
-    if (irmao_remover == NULL || eh_folha(irmao_remover))
+    if (irmao_substituto == NULL || eh_folha(irmao_substituto))
     {
-      if (pai_remover != (*root))
+      if (pai_substituto != (*root))
       {
-        trocar_cor(pai_remover);
+        trocar_cor(pai_substituto);
       }
-      trocar_cor(irmao_remover);
+      trocar_cor(irmao_substituto);
       return;
     }
-    if (irmao_remover->esq->cor == vermelho)
+    if (irmao_substituto->esq->cor == vermelho)
     {
-      rot_simples_dir(root, pai_remover);
-      irmao_remover->esq->cor = preto;
+      if (pai_substituto->cor == preto)
+      {
+        irmao_substituto->esq->cor = preto;
+      }
+      else
+      {
+        irmao_substituto->esq->cor = vermelho;
+      }
+      rot_simples_dir(root, pai_substituto);
       return;
     }
-    else if (irmao_remover->dir->cor == vermelho)
+    else if (irmao_substituto->dir->cor == vermelho)
     {
-      rot_simples_esq(root, pai_remover);
-      irmao_remover->dir->cor = preto;
+      if (pai_substituto->cor == preto)
+      {
+        irmao_substituto->dir->cor = preto;
+      }
+      else
+      {
+        irmao_substituto->dir->cor = vermelho;
+      }
+      rot_simples_esq(root, pai_substituto);
       return;
     }
   }
-  if (irmao_remover->cor == vermelho)
+  if (irmao_substituto->cor == vermelho)
   {
-    if (posicao_filho(pai_remover, irmao_remover) == 0)
+    if (posicao_filho(pai_substituto, irmao_substituto) == 0)
     {
-      rot_simples_dir(root, pai_remover);
+      printf("a");
+      if (irmao_substituto->pai->cor == preto)
+      {
+        irmao_substituto->dir->cor = vermelho;
+      }
+      rot_simples_dir(root, pai_substituto);
     }
-    else if (posicao_filho(pai_remover, irmao_remover) == 1)
+    else if (posicao_filho(pai_substituto, irmao_substituto) == 1)
     {
-      rot_simples_esq(root, pai_remover);
+      printf("b");
+      if (irmao_substituto->pai->cor == preto)
+      {
+        irmao_substituto->esq->cor = vermelho;
+      }
+      rot_simples_esq(root, irmao_substituto->pai);
+      imprimir(*root);
     }
     return;
   }
@@ -650,7 +865,9 @@ int main()
     case 3:
       printf("Insira o valor do no a ser removido: ");
       scanf("%d", &num);
-      remover_balanceado(&root, buscar_no(root, num));
+      node = buscar_no(root, num);
+      remover_balanceado(&root, node);
+      printf("removeu\n");
       balanceada(&root, root);
       break;
     case 4:
@@ -661,6 +878,12 @@ int main()
       scanf("%d", &num);
       node = buscar_no(root, num);
       altura(node);
+      break;
+    case 6:
+      printf("Insira o valor do no a ser rotacionado: ");
+      scanf("%d", &num);
+      node = buscar_no(root, num);
+      rot_simples_esq(&root, node);
       break;
     case 0:
       break;
