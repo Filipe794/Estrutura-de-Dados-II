@@ -5,8 +5,10 @@
 
 #define size 50
 #define qnt_pessoas_sorteadas 10
-#define mod_hash_0 7
-#define mod_hash_1 11
+
+// a distribuição fica melhor usando os tres numeros primos mais proximos de 50: 41,43,47
+#define mod_hash_0 41
+#define mod_hash_1 43
 
 int hash_0(int chave)
 {
@@ -32,6 +34,7 @@ typedef struct pessoa
 
 typedef struct hash
 {
+    int pos = 0;
     participante *participantes[size];
 
 } hash_table;
@@ -44,6 +47,16 @@ hash_table *init_hash_table()
         table->participantes[i] = NULL;
     }
     return table;
+}
+int gera_chave(char *nome)
+{
+    int chave = 0;
+
+    for (int i = 0; nome[i] != '\0'; i++)
+    {
+        chave += int(nome[i]);
+    }
+    return chave;
 }
 
 participante *init_participante()
@@ -61,9 +74,7 @@ participante *init_participante()
     printf("Insira a renda mensal do participante: ");
     scanf("%f", &new_p->renda_mensal);
 
-    int chave = int(new_p->nome[0]);
-    printf("Chave Participante: %d\n", chave);
-    new_p->chave = chave;
+    new_p->chave = gera_chave(new_p->nome);
 
     return new_p;
 }
@@ -71,9 +82,11 @@ participante *init_participante()
 int insertion(hash_table *root, participante *participante, int k = 0)
 {
     int index = hash(participante->chave, k);
+    // printf("Index: %d\n",index);
 
     if (root->participantes[index] == NULL)
     { // nao ocorre colisão, posso inserir
+        root->pos++;
         root->participantes[index] = participante;
         return 1;
     }
@@ -82,14 +95,12 @@ int insertion(hash_table *root, participante *participante, int k = 0)
         printf("Participante já cadastrado!\n");
         return 1;
     }
-    else
+    else if (k < 3000) // numero arbitrario para as tentativas
     {
-        if (k < 3000) // numero arbitrario para as tentativas
-        {
-            k++;
-            return insertion(root, participante, k);
-        }
+        k++;
+        return insertion(root, participante, k);
     }
+    printf("Erro na inserção: Tabela cheia ou todos os index gerados estão ocupados.\n");
     return 0;
 }
 
@@ -100,7 +111,7 @@ participante *busca(hash_table *root, char *nome, int k = 0)
         printf("Tabela Hash vazia.\n");
         return NULL;
     }
-    int chave = int(nome[0]);
+    int chave = gera_chave(nome);
     int index = hash(chave, k);
 
     if (root->participantes[index] == NULL)
@@ -167,6 +178,11 @@ bool numero_repetido(int num, int *sorteados, int tamanho)
 
 void imprimir_sorteados(hash_table *root)
 {
+    if (root->pos < 10)
+    {
+        printf("Nao ha cadastros suficientes para realizar o sorteio");
+        return;
+    }
     int sorteados[qnt_pessoas_sorteadas];
 
     for (int i = 0; i < qnt_pessoas_sorteadas; i++)
@@ -178,7 +194,7 @@ void imprimir_sorteados(hash_table *root)
         } while (numero_repetido(index, sorteados, i));
         sorteados[i] = index;
     }
-    // como alguns index ficam vazios, o sorteio acabara nao imprimindo exatatemente 10
+    // como alguns index podem ficar vazios, o sorteio acabara nao imprimindo exatamente 10
     // pra resolver isso, dps de sortear os numeros verificando se eles estão repetidos
     // vou verificar se algum index gerado leva pra um campo nulo na tabela
     // caso isso aconteça, chamo a função recursivamente
@@ -202,7 +218,9 @@ void imprimir_sorteados(hash_table *root)
             imprimir_participante(root->participantes[sorteados[i]]);
             printf("\n");
         }
-    }else{
+    }
+    else
+    {
         imprimir_sorteados(root);
     }
 }
@@ -223,7 +241,7 @@ void menu()
 //     strcpy(p->nome, nome);
 //     strcpy(p->emprego, emprego);
 //     p->renda_mensal = (rand() % 10000) / 100.0; // Renda mensal aleatória entre 0 e 10000
-//     int chave = int(p->nome[0]);
+//     int chave = gera_chave(p->nome);
 //     printf("Chave Participante: %d\n", chave);
 //     p->chave = chave;
 //     return p;
@@ -231,106 +249,157 @@ void menu()
 // void preencher_tabela(hash_table *root)
 // {
 //     participante *p1 = cria_participante("Filipe", "Astronauta");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Joana", "Engenheira");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Pedro", "Médico");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Laura", "Advogada");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Ricardo", "Professor");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Mariana", "Arquiteta");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Antonio", "Policial");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Camila", "Bombeira");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Gustavo", "Empresário");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Ana", "Psicóloga");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Lucas", "Estudante");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Juliana", "Atleta");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Henrique", "Cientista");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Isabela", "Artista");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Eduardo", "Músico");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Amanda", "Jornalista");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Felipe", "Programador");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Carolina", "Piloto");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Vitor", "Enfermeiro");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Renata", "Chef");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Fernando", "Fotógrafo");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Larissa", "Estilista");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Bruno", "Vendedor");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Marina", "Pesquisadora");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Roberto", "Cineasta");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Paula", "Engenheira Civil");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Rafael", "Escritor");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Mariano", "Pintor");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Sofia", "Psiquiatra");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Thiago", "Empreendedor");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Natalia", "Bailarina");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Gabriel", "Cantor");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Beatriz", "Bióloga");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Vinicius", "Motorista");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Letícia", "Designer");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Rodrigo", "Político");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Cristina", "Veterinária");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Leonardo", "Engenheiro de Software");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Tatiana", "Farmacêutica");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Alexandre", "Empresário");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Patrícia", "Psicóloga");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Guilherme", "Advogado");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Carla", "Arquiteta");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Daniel", "Professor");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
-//     p1 = cria_participante("Renata", "Pesquisadora");
+//     p1 = cria_participante("François", "Pesquisadora");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Marcelo", "Engenheiro Elétrico");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Gisele", "Atleta");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Luciano", "Artista Plástico");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Mariana", "Médica");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("André", "Músico");
+//     printf("%s: \n", p1->nome);
 //     insertion(root, p1);
 //     p1 = cria_participante("Carolina", "Estudante de Direito");
+//     printf("%s: \n", p1->nome);
 // }
 
 int main()
@@ -338,11 +407,11 @@ int main()
     srand(time(NULL));
     hash_table *root = init_hash_table();
     char nome[20];
-    int status = 1;
+    // int status = 1;
     int opc = -1;
     participante *p;
 
-    // função pra teste
+        // função pra teste
     // preencher_tabela(root);
 
     while (opc != 0)
@@ -353,11 +422,7 @@ int main()
         {
         case 1:
             p = init_participante();
-            status = insertion(root, p);
-            if (status == 0)
-            {
-                printf("Erro na inserção: Tabela cheia ou todos os index gerados estão ocupados.\n");
-            }
+            insertion(root, p);
             break;
         case 2:
             printf("Insira o nome a ser procurado: ");
