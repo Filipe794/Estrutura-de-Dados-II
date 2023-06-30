@@ -79,7 +79,7 @@ participante *init_participante()
     return new_p;
 }
 
-int insertion(hash_table *root, participante *participante, int k = 0)
+void insertion(hash_table *root, participante *participante, int k = 0)
 {
     int index = hash(participante->chave, k);
     // printf("Index: %d\n",index);
@@ -88,20 +88,20 @@ int insertion(hash_table *root, participante *participante, int k = 0)
     { // nao ocorre colisão, posso inserir
         root->pos++;
         root->participantes[index] = participante;
-        return 1;
+        return;
     }
     else if (strcmp(root->participantes[index]->nome, participante->nome) == 0)
     {
         printf("Participante já cadastrado!\n");
-        return 1;
+        return;
     }
-    else if (k < 3000) // numero arbitrario para as tentativas
+    else if (k < size) // numero arbitrario para as tentativas
     {
         k++;
         return insertion(root, participante, k);
     }
     printf("Erro na inserção: Tabela cheia ou todos os index gerados estão ocupados.\n");
-    return 0;
+    return;
 }
 
 participante *busca(hash_table *root, char *nome, int k = 0)
@@ -407,7 +407,6 @@ int main()
     srand(time(NULL));
     hash_table *root = init_hash_table();
     char nome[20];
-    // int status = 1;
     int opc = -1;
     participante *p;
 
